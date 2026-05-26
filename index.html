@@ -1,0 +1,2985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Strata — A platform for design strategists</title>
+<style>
+  :root{
+    --ink:#0E1116;
+    --ink-2:#2A2F3A;
+    --muted:#6B7280;
+    --muted-2:#9CA3AF;
+    --line:#E5E7EB;
+    --line-2:#F1F2F4;
+    --paper:#FAFAF7;
+    --paper-2:#F4F3EE;
+    --accent:#3B2EFB;       /* electric indigo */
+    --accent-soft:#EEEBFF;
+    --warm:#E5572F;         /* clay */
+    --warm-soft:#FBE9E1;
+    --green:#0E7C5A;
+    --green-soft:#E2F3EC;
+    --yellow:#F5C518;
+    --shadow: 0 1px 2px rgba(14,17,22,0.05), 0 8px 24px rgba(14,17,22,0.06);
+    --shadow-2: 0 1px 2px rgba(14,17,22,0.05), 0 18px 40px rgba(14,17,22,0.08);
+    --radius:14px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  .serif{font-family: 'Fraunces', 'Source Serif Pro', Georgia, serif; font-weight:500; letter-spacing:-0.01em;}
+  .mono{font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;}
+  a{color:inherit; text-decoration:none}
+
+  /* Layout */
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px}
+
+  /* Top nav */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(14px);
+    background:rgba(250,250,247,0.82);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; height:64px}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-0.01em}
+  .brand-mark{
+    width:28px; height:28px; border-radius:8px;
+    background:linear-gradient(135deg, var(--ink) 0%, var(--accent) 100%);
+    position:relative;
+  }
+  .brand-mark::after{
+    content:""; position:absolute; left:6px; top:6px; right:6px; bottom:6px;
+    border:1.5px solid #fff; border-radius:3px; opacity:.9;
+  }
+  .brand-name{font-size:17px}
+  .brand-name span{color:var(--muted); font-weight:400}
+  .tabs{display:flex; gap:4px; background:var(--line-2); padding:4px; border-radius:999px; border:1px solid var(--line)}
+  .tab{
+    padding:7px 14px; border-radius:999px; font-size:13px;
+    color:var(--ink-2); cursor:pointer; transition:all .15s ease;
+    white-space:nowrap;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab.active{background:#fff; color:var(--ink); box-shadow:0 1px 2px rgba(14,17,22,.06)}
+  .nav-cta{display:flex; gap:8px; align-items:center}
+  .btn{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:8px 14px; border-radius:10px; font-size:13px; font-weight:500;
+    border:1px solid var(--line); background:#fff; color:var(--ink);
+    cursor:pointer; transition:all .15s ease;
+  }
+  .btn:hover{border-color:var(--ink-2)}
+  .btn-primary{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .btn-primary:hover{background:#000}
+  .btn-accent{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .btn-accent:hover{filter:brightness(0.95)}
+  .btn-ghost{background:transparent; border-color:transparent; color:var(--ink-2)}
+  .btn-sm{padding:5px 10px; font-size:12px}
+
+  /* Section */
+  .section{padding:80px 0; display:none}
+  .section.active{display:block; animation: fade .3s ease}
+  @keyframes fade { from {opacity:0; transform:translateY(4px)} to {opacity:1; transform:none} }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; color:var(--accent); font-weight:500;
+    text-transform:uppercase; letter-spacing:0.08em;
+    background:var(--accent-soft); padding:5px 11px; border-radius:999px;
+  }
+  .eyebrow .dot{width:6px; height:6px; background:var(--accent); border-radius:50%}
+
+  h1.headline{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:400; font-size:66px; line-height:1.02; letter-spacing:-0.03em;
+    margin:18px 0 18px;
+  }
+  h1.headline em{font-style:italic; color:var(--accent); font-weight:300}
+  h2.section-title{
+    font-family:'Fraunces', Georgia, serif;
+    font-weight:400; font-size:42px; line-height:1.08; letter-spacing:-0.02em;
+    margin:14px 0 14px;
+  }
+  h2.section-title em{font-style:italic; color:var(--accent); font-weight:300}
+  h3{font-weight:600; letter-spacing:-0.01em; margin:0}
+  .lede{font-size:18px; color:var(--ink-2); max-width:640px; line-height:1.55}
+
+  /* HERO */
+  .hero{position:relative; padding-top:80px; padding-bottom:60px}
+  .hero-grid{display:grid; grid-template-columns: 1.05fr 0.95fr; gap:60px; align-items:center}
+  .hero-blurb{font-size:15px; color:var(--muted); max-width:520px; margin-top:8px}
+  .hero-ctas{display:flex; gap:10px; margin-top:30px}
+  .hero-meta{display:flex; gap:24px; margin-top:42px; padding-top:28px; border-top:1px solid var(--line)}
+  .hero-meta-item{font-size:13px; color:var(--muted)}
+  .hero-meta-item strong{display:block; color:var(--ink); font-size:22px; font-weight:500; letter-spacing:-0.01em; margin-bottom:2px; font-family:'Fraunces', Georgia, serif}
+
+  /* Hero visual — card stack */
+  .hero-visual{position:relative; height:520px}
+  .stack-card{
+    position:absolute; background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:18px; box-shadow:var(--shadow-2);
+    transition: transform .3s ease;
+  }
+  .stack-card.s1{ top:0; left:0; width:300px; transform:rotate(-3deg);}
+  .stack-card.s2{ top:140px; left:160px; width:330px; transform:rotate(2deg); z-index:2;}
+  .stack-card.s3{ top:320px; left:40px; width:290px; transform:rotate(-1deg);}
+  .stack-card:hover{transform:rotate(0deg) translateY(-4px); z-index:5}
+  .card-head{display:flex; gap:10px; align-items:center; margin-bottom:10px}
+  .avatar{width:34px; height:34px; border-radius:50%; flex-shrink:0; background:var(--line); display:flex; align-items:center; justify-content:center; font-weight:600; font-size:13px; color:#fff}
+  .av-1{background:linear-gradient(135deg,#0E7C5A,#0F9D63)}
+  .av-2{background:linear-gradient(135deg,#3B2EFB,#7768FF)}
+  .av-3{background:linear-gradient(135deg,#E5572F,#F5874A)}
+  .av-4{background:linear-gradient(135deg,#1F2937,#4B5563)}
+  .av-5{background:linear-gradient(135deg,#8B5CF6,#C084FC)}
+  .av-6{background:linear-gradient(135deg,#0891B2,#06B6D4)}
+  .av-name{font-size:13px; font-weight:600}
+  .av-role{font-size:11px; color:var(--muted)}
+  .q-text{font-size:14px; line-height:1.45; color:var(--ink-2)}
+  .q-text strong{color:var(--ink)}
+  .pill-row{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+  .pill{
+    font-size:11px; padding:3px 8px; border-radius:999px;
+    background:var(--line-2); color:var(--ink-2); font-weight:500;
+  }
+  .pill.accent{background:var(--accent-soft); color:var(--accent)}
+  .pill.warm{background:var(--warm-soft); color:var(--warm)}
+  .pill.green{background:var(--green-soft); color:var(--green)}
+
+  /* Problem section */
+  .problem-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:48px}
+  .problem-card{
+    background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:32px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
+  }
+  .problem-card.student::before, .problem-card.alumni::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:3px;
+  }
+  .problem-card.student::before{background:var(--accent)}
+  .problem-card.alumni::before{background:var(--warm)}
+  .pc-label{font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:6px}
+  .pc-title{font-family:'Fraunces',Georgia,serif; font-weight:400; font-size:26px; letter-spacing:-0.02em; margin-bottom:14px}
+  .pc-body{font-size:15px; color:var(--ink-2); line-height:1.6}
+  .pc-quotes{margin-top:20px; padding-top:20px; border-top:1px solid var(--line)}
+  .pc-quote{font-size:13px; color:var(--muted); font-style:italic; margin-bottom:8px; padding-left:14px; border-left:2px solid var(--line)}
+
+  .competitive{
+    margin-top:60px; background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:32px; box-shadow:var(--shadow);
+  }
+  .comp-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:20px}
+  .comp-cell{
+    border:1px solid var(--line); border-radius:var(--radius-sm); padding:18px;
+    background:var(--paper);
+  }
+  .comp-cell.us{background:var(--accent-soft); border-color:#D9D2FF}
+  .comp-name{font-weight:600; font-size:14px; margin-bottom:4px}
+  .comp-issue{font-size:12px; color:var(--muted); line-height:1.5}
+  .comp-cell.us .comp-issue{color:var(--ink-2)}
+
+  /* How it works */
+  .how-steps{display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px}
+  .how-step{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px; position:relative; box-shadow:var(--shadow);
+  }
+  .step-num{
+    font-family:'Fraunces',serif; font-size:48px; font-weight:300;
+    color:var(--accent); line-height:1; letter-spacing:-0.03em;
+  }
+  .step-title{font-family:'Fraunces',serif; font-weight:400; font-size:22px; letter-spacing:-0.01em; margin:10px 0 8px}
+  .step-body{font-size:14px; color:var(--ink-2); line-height:1.6}
+
+  .flow-diagram{
+    margin-top:60px; background:#fff; border:1px solid var(--line);
+    border-radius:var(--radius); padding:40px; box-shadow:var(--shadow);
+  }
+  .flow-row{display:flex; align-items:center; gap:16px; justify-content:space-between}
+  .flow-node{
+    flex:1; background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:18px; text-align:center;
+  }
+  .flow-node.ai{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .flow-node.ai .fn-label{color:var(--muted-2)}
+  .fn-icon{font-size:24px; margin-bottom:8px}
+  .fn-label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:4px}
+  .fn-text{font-size:14px; font-weight:500}
+  .flow-arrow{color:var(--muted-2); font-size:18px}
+
+  /* Demo (Ask) */
+  .demo-shell{
+    margin-top:40px; background:#fff; border:1px solid var(--line);
+    border-radius:18px; overflow:hidden; box-shadow:var(--shadow-2);
+  }
+  .demo-bar{
+    display:flex; align-items:center; gap:8px; padding:14px 18px;
+    border-bottom:1px solid var(--line); background:var(--paper);
+  }
+  .traffic{display:flex; gap:6px}
+  .traffic span{width:11px; height:11px; border-radius:50%}
+  .traffic span:nth-child(1){background:#FF5F57}
+  .traffic span:nth-child(2){background:#FEBC2E}
+  .traffic span:nth-child(3){background:#28C840}
+  .demo-url{
+    flex:1; background:#fff; border:1px solid var(--line); border-radius:8px;
+    padding:5px 12px; font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace;
+    text-align:center;
+  }
+  .demo-body{padding:32px; display:grid; grid-template-columns: 220px 1fr; gap:28px; min-height:600px}
+  .demo-sidebar h4{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:0 0 10px}
+  .demo-nav-item{
+    display:flex; align-items:center; gap:8px; padding:8px 10px;
+    border-radius:8px; font-size:13px; color:var(--ink-2); cursor:pointer;
+    transition:background .15s;
+  }
+  .demo-nav-item:hover{background:var(--line-2)}
+  .demo-nav-item.active{background:var(--ink); color:#fff}
+  .demo-nav-item .ico{width:16px; height:16px; display:inline-block; opacity:.8}
+  .demo-divider{height:1px; background:var(--line); margin:20px 0}
+
+  .ask-bar{
+    display:flex; gap:10px; align-items:center;
+    background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    padding:6px 8px 6px 18px; margin-bottom:24px;
+  }
+  .ask-bar input{
+    flex:1; border:none; background:transparent; font-size:15px;
+    outline:none; padding:10px 0; color:var(--ink); font-family:inherit;
+  }
+  .ask-bar input::placeholder{color:var(--muted-2)}
+  .suggestion-chips{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:32px}
+  .chip{
+    font-size:12px; padding:6px 12px; border-radius:999px;
+    background:#fff; border:1px solid var(--line); color:var(--ink-2);
+    cursor:pointer; transition:all .15s;
+  }
+  .chip:hover{border-color:var(--ink-2); color:var(--ink)}
+  .chip.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+
+  .answer-card{
+    border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; background:#fff; margin-bottom:18px;
+  }
+  .ai-summary{
+    background: linear-gradient(180deg, #F5F3FF 0%, #FFFFFF 100%);
+    border:1px solid #E5DDFF;
+  }
+  .ai-tag{
+    display:inline-flex; align-items:center; gap:6px; font-size:11px;
+    background:var(--ink); color:#fff; padding:4px 10px; border-radius:999px;
+    font-weight:500; letter-spacing:0.02em;
+  }
+  .ai-tag .pulse{
+    width:6px; height:6px; background:#7AE2C5; border-radius:50%;
+    animation: pulse 1.6s infinite ease-in-out;
+  }
+  @keyframes pulse {0%,100%{opacity:.4}50%{opacity:1}}
+  .summary-text{font-size:15px; line-height:1.65; color:var(--ink); margin:14px 0 0}
+  .summary-text strong{font-weight:600; background:linear-gradient(180deg, transparent 60%, #FFE08A 60%); padding:0 2px}
+  .source-count{display:flex; align-items:center; gap:8px; margin-top:16px; font-size:12px; color:var(--muted)}
+  .source-avatars{display:flex}
+  .source-avatars .avatar{width:24px; height:24px; font-size:10px; border:2px solid #fff; margin-left:-6px}
+  .source-avatars .avatar:first-child{margin-left:0}
+
+  .contrib-head{display:flex; gap:12px; align-items:flex-start; margin-bottom:12px}
+  .contrib-head .avatar{width:40px; height:40px; font-size:14px}
+  .contrib-meta{flex:1}
+  .contrib-name{font-weight:600; font-size:14px; display:flex; align-items:center; gap:6px}
+  .verified{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:14px; height:14px; background:var(--accent); color:#fff;
+    border-radius:50%; font-size:9px; font-weight:700;
+  }
+  .contrib-role{font-size:12px; color:var(--muted); margin-top:1px}
+  .contrib-stats{display:flex; gap:14px; font-size:11px; color:var(--muted); margin-top:4px}
+  .contrib-body{font-size:14px; line-height:1.65; color:var(--ink-2)}
+  .contrib-body p{margin:0 0 10px}
+  .contrib-tail{
+    display:flex; justify-content:space-between; align-items:center; margin-top:14px;
+    padding-top:14px; border-top:1px solid var(--line-2);
+  }
+  .open-to-connect{
+    display:inline-flex; align-items:center; gap:6px; font-size:12px;
+    color:var(--green); font-weight:500;
+  }
+  .open-to-connect::before{
+    content:""; width:6px; height:6px; border-radius:50%; background:var(--green);
+  }
+
+  /* Dashboards */
+  .dash-tabs{display:flex; gap:8px; margin-bottom:24px}
+  .dash-tab{
+    padding:9px 16px; border-radius:10px; border:1px solid var(--line); background:#fff;
+    cursor:pointer; font-size:13px; font-weight:500;
+  }
+  .dash-tab.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+
+  .dash-grid{display:grid; grid-template-columns: 1.4fr 1fr; gap:20px}
+  .dash-card{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; box-shadow:var(--shadow);
+  }
+  .dash-card h4{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin:0 0 14px; font-weight:600}
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px}
+  .stat-box{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:14px;
+  }
+  .stat-num{font-family:'Fraunces',serif; font-weight:400; font-size:28px; letter-spacing:-0.02em; line-height:1}
+  .stat-label{font-size:11px; color:var(--muted); margin-top:4px; text-transform:uppercase; letter-spacing:0.05em}
+  .stat-delta{font-size:11px; color:var(--green); margin-top:4px; font-weight:500}
+
+  .activity-row{
+    display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line-2);
+  }
+  .activity-row:last-child{border-bottom:none}
+  .act-dot{width:8px; height:8px; border-radius:50%; flex-shrink:0}
+  .act-dot.green{background:var(--green)}
+  .act-dot.accent{background:var(--accent)}
+  .act-dot.warm{background:var(--warm)}
+  .act-text{flex:1; font-size:13px; color:var(--ink-2)}
+  .act-text strong{color:var(--ink)}
+  .act-time{font-size:11px; color:var(--muted)}
+
+  .topic-bar{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+  .topic-label{flex:1; font-size:13px; color:var(--ink-2)}
+  .topic-track{width:100px; height:6px; background:var(--line-2); border-radius:3px; overflow:hidden}
+  .topic-fill{height:100%; background:var(--accent); border-radius:3px}
+  .topic-pct{font-size:11px; color:var(--muted); width:30px; text-align:right}
+
+  .question-row{
+    display:flex; gap:12px; padding:14px 0; border-bottom:1px solid var(--line-2); cursor:pointer;
+  }
+  .question-row:last-child{border-bottom:none}
+  .question-row:hover{background:var(--paper-2); margin:0 -10px; padding:14px 10px; border-radius:8px}
+  .q-icon{
+    width:36px; height:36px; border-radius:8px; background:var(--accent-soft);
+    color:var(--accent); display:flex; align-items:center; justify-content:center;
+    font-weight:600; font-size:14px; flex-shrink:0;
+  }
+  .q-content{flex:1}
+  .q-title{font-size:13px; font-weight:500; color:var(--ink}
+  .q-sub{font-size:11px; color:var(--muted); margin-top:2px}
+  .q-badge{
+    font-size:10px; padding:2px 7px; border-radius:999px;
+    background:var(--green-soft); color:var(--green); font-weight:500; align-self:center;
+  }
+
+  /* Contribution flow (mentor side) */
+  .contrib-flow{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px; margin-top:20px; box-shadow:var(--shadow);
+  }
+  .micro-task{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:16px; margin-bottom:12px; display:flex; gap:14px; align-items:center;
+  }
+  .micro-task .check{
+    width:22px; height:22px; border:1.5px solid var(--line); border-radius:50%;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  }
+  .micro-task.done .check{background:var(--green); border-color:var(--green); color:#fff}
+  .mt-content{flex:1}
+  .mt-title{font-size:14px; font-weight:500}
+  .mt-sub{font-size:12px; color:var(--muted); margin-top:2px}
+  .mt-time{font-size:11px; color:var(--muted); background:var(--line-2); padding:3px 8px; border-radius:999px}
+
+  /* AI layer */
+  .ai-grid{display:grid; grid-template-columns: 1fr 1fr; gap:28px; align-items:start; margin-top:40px}
+  .ai-visual{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:32px; box-shadow:var(--shadow); position:relative;
+  }
+  .ai-layer{
+    background:var(--paper); border:1px dashed var(--line); border-radius:var(--radius-sm);
+    padding:14px; margin-bottom:8px; display:flex; gap:12px; align-items:center;
+  }
+  .ai-layer.core{background:var(--ink); color:#fff; border-color:var(--ink); border-style:solid}
+  .ai-layer .layer-num{
+    width:24px; height:24px; border-radius:50%; background:#fff; color:var(--ink);
+    display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600;
+    flex-shrink:0;
+  }
+  .ai-layer.core .layer-num{background:var(--accent); color:#fff}
+  .layer-title{font-size:13px; font-weight:500}
+  .layer-sub{font-size:11px; opacity:.7; margin-top:2px}
+
+  .ai-points{display:flex; flex-direction:column; gap:18px}
+  .ai-point{display:flex; gap:14px}
+  .ai-point .num{
+    font-family:'Fraunces',serif; font-weight:400; font-size:22px;
+    color:var(--accent); width:30px; flex-shrink:0; line-height:1.2;
+  }
+  .ap-title{font-weight:600; font-size:15px; margin-bottom:4px}
+  .ap-body{font-size:14px; color:var(--ink-2); line-height:1.6}
+
+  /* Business model */
+  .biz-grid{display:grid; grid-template-columns: repeat(3,1fr); gap:18px; margin-top:40px}
+  .biz-card{
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:26px; box-shadow:var(--shadow);
+  }
+  .biz-card.feature{border:2px solid var(--ink); background:var(--ink); color:#fff}
+  .biz-card.feature .biz-price small, .biz-card.feature ul li, .biz-card.feature .biz-name{color:#fff}
+  .biz-card.feature ul li::before{filter:invert(1) brightness(2)}
+  .biz-name{font-size:13px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:600}
+  .biz-price{font-family:'Fraunces',serif; font-weight:400; font-size:40px; letter-spacing:-0.02em; margin:10px 0 4px}
+  .biz-price small{font-size:14px; color:var(--muted); font-weight:400; font-family:'Inter',sans-serif}
+  .biz-blurb{font-size:13px; color:var(--muted); margin-bottom:18px}
+  .biz-card.feature .biz-blurb{color:rgba(255,255,255,.7)}
+  .biz-card ul{list-style:none; padding:0; margin:0}
+  .biz-card ul li{font-size:13px; padding:7px 0; padding-left:20px; position:relative; color:var(--ink-2); border-bottom:1px solid var(--line-2)}
+  .biz-card.feature ul li{border-color:rgba(255,255,255,.1)}
+  .biz-card ul li:last-child{border-bottom:none}
+  .biz-card ul li::before{
+    content:"✓"; position:absolute; left:0; top:7px; color:var(--green);
+    font-weight:600; font-size:12px;
+  }
+
+  .market-stats{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:40px;
+    background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:30px; box-shadow:var(--shadow);
+  }
+  .market-stat .ms-num{font-family:'Fraunces',serif; font-size:36px; font-weight:400; letter-spacing:-0.02em; color:var(--ink)}
+  .market-stat .ms-num em{font-style:italic; color:var(--accent)}
+  .market-stat .ms-label{font-size:12px; color:var(--muted); margin-top:4px}
+
+  .gtm-wrap{
+    margin-top:40px; background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:32px; box-shadow:var(--shadow);
+  }
+  .gtm-phases{display:grid; grid-template-columns: repeat(3,1fr); gap:18px; margin-top:20px}
+  .gtm-phase{padding:18px; border-left:3px solid var(--line); padding-left:18px}
+  .gtm-phase.p1{border-color:var(--accent)}
+  .gtm-phase.p2{border-color:var(--warm)}
+  .gtm-phase.p3{border-color:var(--green)}
+  .gtm-label{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); font-weight:600}
+  .gtm-title{font-family:'Fraunces',serif; font-size:18px; font-weight:400; margin:6px 0 8px; letter-spacing:-0.01em}
+  .gtm-body{font-size:13px; color:var(--ink-2); line-height:1.55}
+
+  /* Roadmap */
+  .roadmap{margin-top:40px}
+  .road-row{
+    display:grid; grid-template-columns:140px 1fr; gap:24px; padding:24px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .road-row:last-child{border-bottom:none}
+  .road-quarter{font-family:'Fraunces',serif; font-size:20px; letter-spacing:-0.01em; font-weight:400; color:var(--accent)}
+  .road-quarter small{display:block; font-family:'Inter',sans-serif; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; font-weight:600; margin-top:4px}
+  .road-items{display:flex; flex-wrap:wrap; gap:8px}
+  .road-item{
+    font-size:13px; padding:8px 14px; background:var(--paper); border:1px solid var(--line);
+    border-radius:999px; color:var(--ink-2);
+  }
+  .road-item.done{background:var(--green-soft); border-color:#A7DCC4; color:var(--green)}
+
+  /* Footer / CTA */
+  .cta-block{
+    background:var(--ink); color:#fff; border-radius:18px;
+    padding:60px 50px; margin-top:60px; position:relative; overflow:hidden;
+  }
+  .cta-block::before{
+    content:""; position:absolute; right:-100px; top:-100px; width:400px; height:400px;
+    background:radial-gradient(circle, rgba(59,46,251,0.4) 0%, transparent 70%);
+  }
+  .cta-block h2{font-family:'Fraunces',serif; font-weight:400; font-size:36px; letter-spacing:-0.02em; margin:0 0 12px; max-width:520px}
+  .cta-block p{color:rgba(255,255,255,.7); font-size:15px; max-width:520px; margin:0 0 24px}
+  .cta-block .btn{background:#fff; color:var(--ink); border-color:#fff}
+  .cta-block .btn-ghost{background:transparent; color:#fff; border-color:rgba(255,255,255,.3)}
+
+  .footer{padding:40px 0; color:var(--muted); font-size:12px; border-top:1px solid var(--line); margin-top:60px}
+  .footer-inner{display:flex; justify-content:space-between; align-items:center}
+
+  /* ===== Join Strata — profile creation form ===== */
+  .form-card{
+    background:#fff; border:1px solid var(--line); border-radius:18px;
+    box-shadow:var(--shadow-2); overflow:hidden; min-height:620px;
+    display:flex; flex-direction:column;
+  }
+  .form-card-header{
+    padding:24px 28px 20px; border-bottom:1px solid var(--line); background:var(--paper);
+  }
+  .form-card-title{
+    font-family:'Fraunces',serif; font-weight:400; font-size:22px;
+    letter-spacing:-0.01em; margin:0 0 4px;
+  }
+  .form-card-sub{font-size:13px; color:var(--muted); margin:0 0 14px}
+  .progress-bar{
+    height:6px; background:var(--line-2); border-radius:3px; overflow:hidden;
+    position:relative;
+  }
+  .progress-fill{
+    height:100%; background:linear-gradient(90deg, var(--accent), #7768FF);
+    border-radius:3px; transition:width .4s ease; width:20%;
+  }
+  .progress-meta{
+    display:flex; justify-content:space-between; font-size:11px; color:var(--muted);
+    margin-top:8px; letter-spacing:0.04em; text-transform:uppercase; font-weight:500;
+  }
+
+  .form-body{flex:1; padding:30px 28px; overflow-y:auto}
+  .form-step{display:none}
+  .form-step.active{display:block; animation: msgIn .25s ease}
+
+  .form-label{
+    display:block; font-size:14px; font-weight:600; color:var(--ink); margin-bottom:4px;
+  }
+  .form-hint{font-size:12px; color:var(--muted); margin:0 0 12px; line-height:1.5}
+  .form-input, .form-textarea, .form-select{
+    width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:10px;
+    font-size:14px; font-family:inherit; color:var(--ink); background:#fff;
+    transition:border-color .15s; outline:none;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus{
+    border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);
+  }
+  .form-textarea{min-height:90px; resize:vertical; line-height:1.5}
+  .form-row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .form-link-prefix{
+    display:flex; align-items:stretch; border:1px solid var(--line); border-radius:10px; overflow:hidden;
+  }
+  .form-link-prefix span{
+    padding:11px 12px; background:var(--paper); color:var(--muted); font-size:13px;
+    border-right:1px solid var(--line); display:flex; align-items:center;
+  }
+  .form-link-prefix input{
+    flex:1; border:none; padding:11px 14px; font-size:14px; font-family:inherit; outline:none;
+  }
+
+  .radio-stack{display:flex; flex-direction:column; gap:8px}
+  .radio-opt{
+    display:flex; gap:12px; padding:12px 14px; border:1px solid var(--line);
+    border-radius:10px; cursor:pointer; transition:all .15s; align-items:flex-start;
+  }
+  .radio-opt:hover{border-color:var(--ink-2)}
+  .radio-opt.selected{border-color:var(--accent); background:var(--accent-soft)}
+  .radio-circle{
+    width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line);
+    flex-shrink:0; margin-top:2px; transition:all .15s; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .radio-opt.selected .radio-circle{border-color:var(--accent)}
+  .radio-opt.selected .radio-circle::after{
+    content:""; width:8px; height:8px; border-radius:50%; background:var(--accent);
+  }
+  .radio-text{flex:1}
+  .radio-label{font-size:14px; font-weight:500; color:var(--ink); margin-bottom:2px}
+  .radio-sub{font-size:12px; color:var(--muted); line-height:1.45}
+
+  .form-actions{
+    padding:18px 28px; border-top:1px solid var(--line); background:var(--paper);
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .form-actions .step-counter{font-size:12px; color:var(--muted)}
+  .form-actions-right{display:flex; gap:8px}
+
+  /* Skill picker */
+  .skill-grid{display:flex; flex-wrap:wrap; gap:8px; margin-top:4px}
+  .skill-chip{
+    padding:8px 13px; border-radius:999px; background:#fff; border:1px solid var(--line);
+    font-size:13px; color:var(--ink-2); cursor:pointer; transition:all .15s; user-select:none;
+  }
+  .skill-chip:hover{border-color:var(--ink-2)}
+  .skill-chip.selected{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .skill-counter{font-size:12px; color:var(--muted); margin-top:8px}
+  .skill-counter strong{color:var(--ink)}
+
+  /* Review step */
+  .review-row{
+    display:flex; justify-content:space-between; padding:12px 0;
+    border-bottom:1px solid var(--line-2); gap:12px;
+  }
+  .review-row:last-child{border-bottom:none}
+  .review-label{font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; min-width:140px; font-weight:600}
+  .review-value{font-size:14px; color:var(--ink); flex:1; line-height:1.5}
+
+  /* Verification overlay (in form body) */
+  .verifying-state{
+    text-align:center; padding:40px 20px;
+  }
+  .verifying-spinner{
+    width:48px; height:48px; border:3px solid var(--line-2);
+    border-top-color:var(--accent); border-radius:50%;
+    animation:spin 1s linear infinite; margin:0 auto 18px;
+  }
+  .verifying-title{font-family:'Fraunces',serif; font-size:22px; font-weight:400; letter-spacing:-0.01em; margin:0 0 8px}
+  .verifying-sub{font-size:13px; color:var(--muted); max-width:340px; margin:0 auto}
+
+  /* Mentor badges system */
+  .badge-showcase{
+    background: linear-gradient(180deg, #FFF9E8 0%, #FFFFFF 100%);
+    border:1px solid #F2D88A; border-radius:14px; padding:18px;
+  }
+  .badge-row{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap}
+  .badge{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:5px 10px; border-radius:999px; font-size:11px; font-weight:500;
+    background:#fff; border:1px solid var(--line); color:var(--ink-2);
+  }
+  .badge .badge-icon{font-size:13px}
+  .badge.top-voice{background:linear-gradient(90deg, #FFE7A0, #FFD06B); border-color:#E5A93B; color:#7C5418}
+  .badge.helpful{background:linear-gradient(90deg, #DFFBEA, #B7F0CE); border-color:#7DD4A0; color:#0E6F44}
+  .badge.dedication{background:linear-gradient(90deg, #E5E0FF, #C7BEFF); border-color:#8E80FF; color:#3B2EFB}
+  .badge.specialist{background:linear-gradient(90deg, #FCE4EC, #F4B8C8); border-color:#E48BA0; color:#9B2F4D}
+  .badge.responder{background:linear-gradient(90deg, #E0F4FF, #B3DFFF); border-color:#5FAEEC; color:#0E5391}
+  .badge.locked{opacity:.5; filter:grayscale(0.4)}
+  .badge-large{
+    padding:8px 14px; font-size:13px; border-radius:999px; gap:8px;
+  }
+  .badge-large .badge-icon{font-size:16px}
+
+  .badge-explainer{
+    display:flex; gap:12px; padding:12px; border-radius:10px;
+    background:rgba(255,255,255,0.6); margin-bottom:8px; align-items:flex-start;
+  }
+  .badge-explainer .be-name{font-size:13px; font-weight:600; margin-bottom:2px}
+  .badge-explainer .be-criteria{font-size:11px; color:var(--muted); line-height:1.4}
+
+  /* Time dedication tiers */
+  .dedication-meter{
+    background:#fff; border:1px solid var(--line); border-radius:10px;
+    padding:14px; margin-top:10px;
+  }
+  .dedication-track{
+    height:10px; background:var(--line-2); border-radius:5px; position:relative; overflow:hidden;
+    margin:10px 0 6px;
+  }
+  .dedication-fill{
+    height:100%; background:linear-gradient(90deg, var(--accent), #FFC857);
+    border-radius:5px; transition:width .6s ease;
+  }
+  .dedication-tiers{display:flex; justify-content:space-between; font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; font-weight:600}
+  .dedication-tier{flex:1; text-align:center; position:relative}
+  .dedication-tier.active{color:var(--ink)}
+  .dedication-tier::before{
+    content:""; position:absolute; top:-16px; left:50%; transform:translateX(-50%);
+    width:8px; height:8px; border-radius:50%; background:var(--line);
+  }
+  .dedication-tier.active::before{background:var(--accent)}
+
+  /* ===== Join Strata — onboarding agent UI ===== */
+  .join-toggle{
+    display:inline-flex; background:var(--line-2); padding:4px; border-radius:12px;
+    border:1px solid var(--line); margin-top:24px;
+  }
+  .join-toggle-opt{
+    padding:9px 18px; border-radius:9px; font-size:13px; font-weight:500;
+    color:var(--ink-2); cursor:pointer; transition:all .15s;
+  }
+  .join-toggle-opt.active{background:#fff; color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.06)}
+
+  .join-stage{
+    margin-top:32px; display:grid; grid-template-columns: 1.25fr 0.85fr; gap:20px;
+  }
+  .agent-window{
+    background:#fff; border:1px solid var(--line); border-radius:18px;
+    overflow:hidden; box-shadow:var(--shadow-2); display:flex; flex-direction:column;
+    min-height:620px;
+  }
+  .agent-header{
+    display:flex; align-items:center; gap:12px; padding:16px 22px;
+    border-bottom:1px solid var(--line); background:var(--paper);
+  }
+  .agent-avatar{
+    width:36px; height:36px; border-radius:50%;
+    background:linear-gradient(135deg, var(--ink) 0%, var(--accent) 100%);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+    font-weight:600; font-size:14px; flex-shrink:0; position:relative;
+  }
+  .agent-avatar::after{
+    content:""; position:absolute; bottom:-1px; right:-1px;
+    width:10px; height:10px; border-radius:50%;
+    background:#22C55E; border:2px solid #fff;
+  }
+  .agent-meta{flex:1}
+  .agent-name{font-weight:600; font-size:14px}
+  .agent-status{font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px}
+  .agent-status::before{content:"●"; color:#22C55E; font-size:8px}
+  .agent-progress{font-size:11px; color:var(--muted); background:#fff; border:1px solid var(--line); padding:5px 11px; border-radius:999px}
+
+  .chat-body{
+    flex:1; padding:24px; overflow-y:auto; background:#fff;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .msg{display:flex; gap:10px; max-width:88%; animation: msgIn .25s ease}
+  @keyframes msgIn { from {opacity:0; transform:translateY(6px)} to {opacity:1; transform:none} }
+  .msg.user{align-self:flex-end; flex-direction:row-reverse}
+  .msg-av{
+    width:28px; height:28px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:600; color:#fff;
+  }
+  .msg-av.ai{background:linear-gradient(135deg, var(--ink), var(--accent))}
+  .msg-av.user{background:linear-gradient(135deg,#0E7C5A,#0F9D63)}
+  .msg-bubble{
+    padding:11px 15px; border-radius:14px; font-size:14px; line-height:1.55;
+  }
+  .msg.ai .msg-bubble{background:var(--paper); color:var(--ink); border-bottom-left-radius:4px}
+  .msg.user .msg-bubble{background:var(--accent); color:#fff; border-bottom-right-radius:4px}
+  .msg-bubble strong{font-weight:600}
+  .msg-meta{font-size:10px; color:var(--muted); margin-top:4px}
+
+  .typing{display:inline-flex; gap:4px; padding:14px 16px; background:var(--paper); border-radius:14px; border-bottom-left-radius:4px}
+  .typing span{
+    width:6px; height:6px; border-radius:50%; background:var(--muted-2);
+    animation: typing 1.2s infinite ease-in-out;
+  }
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes typing{0%,80%,100%{transform:scale(0.7); opacity:.5}40%{transform:scale(1); opacity:1}}
+
+  .chat-input-area{
+    padding:14px 22px; border-top:1px solid var(--line); background:var(--paper);
+    display:flex; gap:10px; align-items:center;
+  }
+  .chat-input{
+    flex:1; padding:10px 14px; border:1px solid var(--line); border-radius:10px;
+    font-size:13px; background:#fff; color:var(--ink); font-family:inherit;
+  }
+  .chat-input::placeholder{color:var(--muted-2)}
+
+  .reply-chips{display:flex; gap:8px; flex-wrap:wrap; padding:0 22px 14px}
+  .reply-chip{
+    font-size:12px; padding:8px 14px; border-radius:999px;
+    background:#fff; border:1px solid var(--accent); color:var(--accent);
+    cursor:pointer; font-weight:500; transition:all .15s;
+  }
+  .reply-chip:hover{background:var(--accent); color:#fff}
+  .reply-chip.next{background:var(--accent); color:#fff}
+
+  /* Status panel (right side) */
+  .status-panel{display:flex; flex-direction:column; gap:14px}
+  .status-card{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:18px; box-shadow:var(--shadow);
+  }
+  .status-card h4{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--muted); margin:0 0 12px; font-weight:600;
+  }
+  .checklist-item{
+    display:flex; gap:10px; align-items:center; padding:8px 0;
+    font-size:13px; color:var(--ink-2);
+  }
+  .checklist-item .ci-icon{
+    width:20px; height:20px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--line); background:#fff;
+    font-size:11px; color:var(--muted-2);
+  }
+  .checklist-item.done .ci-icon{background:var(--green); border-color:var(--green); color:#fff}
+  .checklist-item.active .ci-icon{background:var(--accent); border-color:var(--accent); color:#fff}
+  .checklist-item.active{color:var(--ink); font-weight:500}
+  .checklist-item.done{color:var(--muted)}
+
+  .linkedin-card{
+    border:1px solid var(--line); border-radius:12px; padding:16px;
+    background:#F8FAFC; display:flex; gap:12px; align-items:flex-start;
+  }
+  .li-logo{
+    width:36px; height:36px; border-radius:8px;
+    background:#0A66C2; display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:16px; flex-shrink:0;
+    font-family:'Fraunces', serif;
+  }
+  .li-name{font-weight:600; font-size:14px}
+  .li-headline{font-size:12px; color:var(--ink-2); margin-top:2px; line-height:1.4}
+  .li-stats{font-size:11px; color:var(--muted); margin-top:6px; display:flex; gap:10px}
+
+  .verify-progress{
+    margin-top:12px; padding-top:12px; border-top:1px dashed var(--line);
+  }
+  .verify-row{
+    display:flex; gap:10px; align-items:center; font-size:12px;
+    color:var(--ink-2); padding:6px 0;
+  }
+  .verify-row .vr-icon{
+    width:16px; height:16px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:10px;
+  }
+  .verify-row.pending .vr-icon{background:var(--line-2); color:var(--muted-2)}
+  .verify-row.checking .vr-icon{background:var(--accent-soft); color:var(--accent)}
+  .verify-row.passed .vr-icon{background:var(--green-soft); color:var(--green)}
+  .verify-row.failed .vr-icon{background:var(--warm-soft); color:var(--warm)}
+  .verify-row.checking .vr-icon::after{
+    content:""; width:8px; height:8px; border:1.5px solid var(--accent);
+    border-top-color:transparent; border-radius:50%; animation: spin .8s linear infinite;
+  }
+  @keyframes spin {to {transform:rotate(360deg)}}
+
+  /* Tier offers */
+  .tier-stack{display:flex; flex-direction:column; gap:10px; margin-top:10px}
+  .tier-card{
+    border:1px solid var(--line); border-radius:12px; padding:14px;
+    background:#fff; cursor:pointer; transition:all .15s;
+  }
+  .tier-card:hover{border-color:var(--accent); transform:translateY(-1px)}
+  .tier-card.recommended{border:2px solid var(--accent); background:var(--accent-soft)}
+  .tier-row{display:flex; justify-content:space-between; align-items:baseline}
+  .tier-name{font-weight:600; font-size:14px}
+  .tier-cost{font-family:'Fraunces',serif; font-size:22px; font-weight:400; letter-spacing:-0.01em}
+  .tier-cost small{font-size:11px; color:var(--muted); font-weight:400; font-family:'Inter',sans-serif}
+  .tier-cost.strike{color:var(--muted-2); text-decoration:line-through; font-size:14px; margin-right:4px}
+  .tier-blurb{font-size:12px; color:var(--ink-2); margin-top:4px; line-height:1.5}
+  .tier-badge{
+    display:inline-block; font-size:10px; padding:2px 7px; border-radius:999px;
+    background:var(--accent); color:#fff; margin-top:6px; font-weight:500;
+  }
+  .tier-badge.green{background:var(--green)}
+  .tier-badge.warm{background:var(--warm)}
+
+  /* Outcome cards */
+  .outcome-card{
+    border-radius:14px; padding:22px; margin-top:6px;
+  }
+  .outcome-card.approved{
+    background:linear-gradient(180deg, #E2F3EC 0%, #F0F9F4 100%);
+    border:1px solid #A7DCC4;
+  }
+  .outcome-card.improve{
+    background:linear-gradient(180deg, #FFF4ED 0%, #FFFAF6 100%);
+    border:1px solid #F5C7A9;
+  }
+  .outcome-title{
+    font-family:'Fraunces',serif; font-weight:400; font-size:22px;
+    letter-spacing:-0.01em; margin:0 0 6px;
+  }
+  .outcome-title.approved{color:var(--green)}
+  .outcome-title.improve{color:var(--warm)}
+  .outcome-body{font-size:13px; color:var(--ink-2); line-height:1.55}
+  .suggestion-list{margin-top:14px; padding:0; list-style:none}
+  .suggestion-list li{
+    padding:10px 12px; background:rgba(255,255,255,0.7); border-radius:8px;
+    margin-bottom:6px; font-size:13px; color:var(--ink-2); display:flex; gap:10px;
+    align-items:flex-start;
+  }
+  .suggestion-list li::before{
+    content:"→"; color:var(--warm); font-weight:600; flex-shrink:0;
+  }
+  .reapply-note{
+    margin-top:14px; padding:10px 12px; background:rgba(255,255,255,.7);
+    border-left:3px solid var(--warm); font-size:12px; color:var(--ink-2);
+  }
+  .reapply-note strong{color:var(--ink)}
+
+  .skills-grid{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+  .skill-pick{
+    font-size:12px; padding:6px 11px; border-radius:999px;
+    background:#fff; border:1px solid var(--line); color:var(--ink-2);
+    cursor:pointer; transition:all .15s;
+  }
+  .skill-pick:hover{border-color:var(--ink-2)}
+  .skill-pick.selected{background:var(--ink); color:#fff; border-color:var(--ink)}
+
+  .agent-tag{
+    display:inline-flex; align-items:center; gap:6px; font-size:11px;
+    background:var(--ink); color:#fff; padding:3px 9px; border-radius:999px;
+    font-weight:500; letter-spacing:0.02em;
+  }
+  .agent-tag .pulse{
+    width:5px; height:5px; background:#7AE2C5; border-radius:50%;
+    animation: pulse 1.6s infinite ease-in-out;
+  }
+
+  /* Restart button */
+  .restart-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12px; color:var(--muted); cursor:pointer;
+    background:transparent; border:none; padding:0;
+  }
+  .restart-btn:hover{color:var(--ink)}
+
+  /* Responsive */
+  @media (max-width: 980px) {
+    .hero-grid{grid-template-columns:1fr; gap:30px}
+    .hero-visual{height:420px}
+    .problem-grid, .how-steps, .ai-grid, .biz-grid, .gtm-phases, .dash-grid, .comp-grid{grid-template-columns:1fr}
+    .market-stats{grid-template-columns:repeat(2,1fr)}
+    h1.headline{font-size:46px}
+    .tabs{overflow-x:auto; max-width:60vw}
+    .demo-body{grid-template-columns:1fr}
+    .demo-sidebar{display:none}
+    .join-stage{grid-template-columns:1fr}
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">Strata <span>· design strategy</span></div>
+    </div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-target="overview">Overview</div>
+      <div class="tab" data-target="problem">Problem</div>
+      <div class="tab" data-target="how">How it works</div>
+      <div class="tab" data-target="demo">Live demo</div>
+    </div>
+    <div class="nav-cta">
+      <button class="btn btn-sm">Sign in</button>
+      <button class="btn btn-primary btn-sm" onclick="goTo('join')">Sign up →</button>
+    </div>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<section class="section active" id="overview">
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>For people in design strategy</span>
+        <h1 class="headline">A career compass for design strategists — <em>powered by people, surfaced by AI.</em></h1>
+        <p class="lede">Strata helps masters students and early career design strategists get specific, honest answers from people who've actually done the work — without the friction of cold DMs, ignored LinkedIn requests, or waiting weeks for a free slot on ADPlist.</p>
+        <p class="hero-blurb">Experienced practitioners contribute short, structured answers once. Strata's AI surfaces the right answers to the right student at the right moment.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" onclick="goTo('demo')">Try the live demo →</button>
+          <button class="btn" onclick="goTo('how')">See how it works</button>
+        </div>
+        <div class="hero-meta">
+          <div class="hero-meta-item"><strong>~2 min</strong> avg time for a mentor to contribute</div>
+          <div class="hero-meta-item"><strong>~30 sec</strong> for a student to get an answer</div>
+          <div class="hero-meta-item"><strong>100%</strong> answers authored by real practitioners</div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="stack-card s1">
+          <div class="card-head">
+            <div class="avatar av-1">SR</div>
+            <div>
+              <div class="av-name">Sara R.</div>
+              <div class="av-role">Asking · MA Design Strategy '26</div>
+            </div>
+          </div>
+          <div class="q-text">"My background is in <strong>industrial design</strong>. Which strategy roles will actually take me seriously?"</div>
+          <div class="pill-row">
+            <span class="pill accent">Career transition</span>
+            <span class="pill">Role positioning</span>
+          </div>
+        </div>
+
+        <div class="stack-card s2">
+          <div class="card-head">
+            <div class="ai-tag"><span class="pulse"></span>AI · synthesizing 7 answers</div>
+          </div>
+          <div class="q-text" style="font-size:13px">Industrial designers are most often hired into <strong>Senior Strategist</strong>, <strong>Innovation Consultant</strong>, and in-house <strong>Strategic Design</strong> roles at consultancies like IDEO, frog, and Designit. The framing that works best in interviews is positioning your IDes background as systems thinking + materiality, not "I switched from product to strategy."</div>
+          <div class="source-count" style="margin-top:12px">
+            <div class="source-avatars">
+              <div class="avatar av-2">MK</div>
+              <div class="avatar av-3">JT</div>
+              <div class="avatar av-4">AP</div>
+              <div class="avatar av-5">DC</div>
+              <div class="avatar av-6">+3</div>
+            </div>
+            <span>Synthesized from 7 practitioners</span>
+          </div>
+        </div>
+
+        <div class="stack-card s3">
+          <div class="card-head">
+            <div class="avatar av-2">MK</div>
+            <div>
+              <div class="av-name">Maya K. <span class="verified" title="verified">✓</span></div>
+              <div class="av-role">Senior Strategist · IDEO · 8 yrs</div>
+            </div>
+          </div>
+          <div class="q-text" style="font-size:13px">"Don't hide the IDes — lean in. We hired three people from product backgrounds last year because they could prototype the future state, not just describe it..."</div>
+          <div class="pill-row" style="justify-content:space-between; align-items:center">
+            <span class="open-to-connect">Open to a 20-min chat</span>
+            <span class="pill green">42 helpful</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Competitive callout -->
+  <div class="wrap">
+    <div class="competitive">
+      <span class="eyebrow"><span class="dot"></span>Why a new platform</span>
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:24px; letter-spacing:-0.01em; margin:10px 0 6px">Existing tools aren't built for design strategy.</h3>
+      <p style="color:var(--muted); font-size:14px; max-width:680px; margin:0">Design strategy is a small, fragmented field. Generic mentorship platforms either flood students with the wrong mentors or never connect them at all.</p>
+      <div class="comp-grid">
+        <div class="comp-cell">
+          <div class="comp-name">LinkedIn</div>
+          <div class="comp-issue">Cold connections rarely accepted. Messages ignored. No mechanism for asynchronous mentorship.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">WhatsApp groups</div>
+          <div class="comp-issue">Noise drowns signal. Same 3 voices answer everything. Knowledge dies in scroll-back.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">ADPlist</div>
+          <div class="comp-issue">Availability gated by mentor calendars. Generic UX/PM mentors over-represented. Slow time-to-answer.</div>
+        </div>
+        <div class="comp-cell us">
+          <div class="comp-name">Strata</div>
+          <div class="comp-issue">Asynchronous, AI-aggregated answers from design strategy specialists. Optional deeper 1:1 connection.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="section" id="problem">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>The Problem</span>
+    <h2 class="section-title">Two groups who <em>want to talk to each other</em> — and can't.</h2>
+    <p class="lede">Design strategy sits in the cracks between consulting, UX, product, and innovation. Both sides feel it: students don't know where they fit, and the people who could tell them don't have a frictionless way to share.</p>
+
+    <div class="problem-grid">
+      <div class="problem-card student">
+        <div class="pc-label">Group A · Students & early career</div>
+        <div class="pc-title">"I don't know what I'm graduating into."</div>
+        <div class="pc-body">
+          People pursuing a Masters in Design Strategy graduate into a field that doesn't have a clear job ladder. They're unsure what roles to apply for, how to translate their past experience (architecture, product, industrial design, marketing) into strategy language, and which companies actually hire for this work.
+        </div>
+        <div class="pc-quotes">
+          <div class="pc-quote">"I have 4 years in industrial design. Recruiters either think I'm too senior or not strategic enough. I have no idea which is true." — IIT IIT-ID '25</div>
+          <div class="pc-quote">"Is 'Innovation Strategist' even a real job, or just a title?" — Parsons MFA '26</div>
+        </div>
+      </div>
+
+      <div class="problem-card alumni">
+        <div class="pc-label">Group B · Alumni & experienced practitioners</div>
+        <div class="pc-title">"I want to help — I just don't know how, or when."</div>
+        <div class="pc-body">
+          Senior strategists genuinely want to support people coming up behind them. The blockers aren't generosity — they're time, decision fatigue, and not knowing what people are actually struggling with. Booking calls feels like overhead. DMs go unanswered because answering one well takes 20 minutes.
+        </div>
+        <div class="pc-quotes">
+          <div class="pc-quote">"I get the same five questions from students. I'd happily answer them once — but every conversation starts from zero." — Strategy Director, frog</div>
+          <div class="pc-quote">"ADPlist sessions are great but I can only do one a month. There has to be a way to help more people with less time." — Founding Strategist</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="competitive" style="margin-top:48px">
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:24px; letter-spacing:-0.01em; margin:0 0 8px">What we're really solving</h3>
+      <p style="color:var(--ink-2); font-size:15px; line-height:1.6; max-width:780px; margin:0">
+        It's not a matchmaking problem. It's a <strong>knowledge asymmetry</strong> problem with a <strong>coordination tax</strong> on top. Strata reduces both: senior practitioners contribute knowledge once in low-effort formats; AI surfaces the relevant fragments to each student instantly, with the option to escalate to a real conversation only when both sides want one.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>How it works</span>
+    <h2 class="section-title">Three steps, two roles, <em>one feedback loop.</em></h2>
+    <p class="lede">Strata is built around a virtuous cycle: students ask, AI surfaces answers from contributing practitioners, students rate, and the system gets better at routing the next question.</p>
+
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Practitioners drop knowledge once</div>
+        <div class="step-body">Senior strategists answer short structured prompts ("What's the most common mistake you see in design strategy portfolios?") on their own time. Each contribution takes 2-3 minutes. Their answers get tagged, embedded, and credited.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Students ask in plain language</div>
+        <div class="step-body">A student types a question — vague, specific, awkwardly phrased, it doesn't matter. Strata's AI parses intent, retrieves the most relevant practitioner answers, and synthesizes a response with citations.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Real names, optional follow-up</div>
+        <div class="step-body">Every claim links back to the practitioner who said it. If they've marked themselves "open to connect," the student can request a 15-min async voice exchange or a scheduled call.</div>
+      </div>
+    </div>
+
+    <div class="flow-diagram">
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:22px; letter-spacing:-0.01em; margin:0 0 20px">The system, end to end</h3>
+      <div class="flow-row">
+        <div class="flow-node">
+          <div class="fn-icon">👥</div>
+          <div class="fn-label">Input</div>
+          <div class="fn-text">Practitioner answers (short-form)</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node ai">
+          <div class="fn-icon">🧠</div>
+          <div class="fn-label">Processing</div>
+          <div class="fn-text">Tag · Embed · Index</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <div class="fn-icon">🎓</div>
+          <div class="fn-label">Trigger</div>
+          <div class="fn-text">Student question</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node ai">
+          <div class="fn-icon">⚡</div>
+          <div class="fn-label">Synthesis</div>
+          <div class="fn-text">AI matches + assembles</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">
+          <div class="fn-icon">💬</div>
+          <div class="fn-label">Output</div>
+          <div class="fn-text">Cited answer + optional intro</div>
+        </div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin:24px 0 0; text-align:center">Each student rating feeds back into the model. High-signal practitioners surface more often. The system compounds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="section" id="demo">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Interactive demo</span>
+    <h2 class="section-title">Ask anything. <em>See how Strata answers.</em></h2>
+    <p class="lede">Click a suggested question below to see how Strata responds — with an AI-synthesized summary on top, followed by the original practitioner answers it drew from.</p>
+
+    <div class="demo-shell">
+      <div class="demo-bar">
+        <div class="traffic"><span></span><span></span><span></span></div>
+        <div class="demo-url">strata.design / ask</div>
+      </div>
+      <div class="demo-body">
+        <aside class="demo-sidebar">
+          <h4>Explore</h4>
+          <div class="demo-nav-item active"><span class="ico">●</span> Ask</div>
+          <div class="demo-nav-item"><span class="ico">○</span> Browse topics</div>
+          <div class="demo-nav-item"><span class="ico">○</span> Practitioners</div>
+          <div class="demo-nav-item"><span class="ico">○</span> My questions</div>
+          <div class="demo-nav-item"><span class="ico">○</span> Saved</div>
+          <div class="demo-divider"></div>
+          <h4>Trending</h4>
+          <div class="demo-nav-item"><span class="ico">🔥</span> Portfolio reviews</div>
+          <div class="demo-nav-item"><span class="ico">💼</span> First-job roles</div>
+          <div class="demo-nav-item"><span class="ico">🌍</span> US vs EU markets</div>
+          <div class="demo-nav-item"><span class="ico">🎯</span> Niching down</div>
+        </aside>
+
+        <div>
+          <div class="ask-bar">
+            <span style="color:var(--muted-2); font-size:18px">🔎</span>
+            <input id="askInput" placeholder="What do you want to know about design strategy?" />
+            <button class="btn btn-primary btn-sm" onclick="runAsk()">Ask</button>
+          </div>
+          <div class="suggestion-chips">
+            <div class="chip active" data-q="q1" onclick="loadAnswer('q1')">Coming from architecture — am I a fit for strategy roles?</div>
+            <div class="chip" data-q="q2" onclick="loadAnswer('q2')">What does a strategist actually do day-to-day?</div>
+            <div class="chip" data-q="q3" onclick="loadAnswer('q3')">Should I niche down or stay generalist?</div>
+            <div class="chip" data-q="q4" onclick="loadAnswer('q4')">How do I make my portfolio strategic, not just visual?</div>
+          </div>
+
+          <div id="answerArea"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN STRATA — profile creation form -->
+<section class="section" id="join">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Create your profile</span>
+    <h2 class="section-title">Sign up — <em>tell us who you are.</em></h2>
+    <p class="lede">Strata asks different questions depending on whether you're joining as a student or as a practitioner. Each profile is verified against LinkedIn before activation. Pick your role to see the form.</p>
+
+    <div class="join-toggle" id="joinToggle">
+      <div class="join-toggle-opt active" data-flow="student" onclick="setFlow('student')">🎓 Sign up as a student</div>
+      <div class="join-toggle-opt" data-flow="mentor" onclick="setFlow('mentor')">💼 Apply as a practitioner</div>
+    </div>
+
+    <!-- STUDENT FORM -->
+    <div class="join-stage" id="flow-student">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-title">Create your student profile</div>
+          <div class="form-card-sub">4 short questions + LinkedIn. Atlas will personalize Strata to your goals once verified.</div>
+          <div class="progress-bar"><div class="progress-fill" id="studentProgressBar" style="width:20%"></div></div>
+          <div class="progress-meta"><span id="studentStepLabel">Step 1 · Your intent</span><span id="studentProgressPct">20%</span></div>
+        </div>
+
+        <div class="form-body" id="studentFormBody">
+
+          <div class="form-step active" data-step="1">
+            <label class="form-label">What are you looking for on Strata?</label>
+            <p class="form-hint">Write in your own words — or pick a common starting point from the dropdown and edit it.</p>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Pick a common answer (optional)</label>
+            <select class="form-select" onchange="fillField('s-q1', this)">
+              <option value="">— Start from scratch —</option>
+              <option value="I'm finishing my MA in Design Strategy and trying to figure out which roles fit my industrial design background.">Career direction after my masters</option>
+              <option value="I want to hear honest advice from people actually doing design strategy work — not LinkedIn fluff.">Honest advice from real practitioners</option>
+              <option value="I need someone to review my portfolio and prep me for strategy interviews.">Portfolio and interview help</option>
+              <option value="I'm a working professional considering a pivot into design strategy and want to understand the field.">Exploring a pivot into design strategy</option>
+              <option value="I want to understand which industries and companies hire for design strategy.">Mapping the job market</option>
+            </select>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:14px">Your answer</label>
+            <textarea class="form-textarea" id="s-q1" placeholder="Type your answer here..."></textarea>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <label class="form-label">What are your career goals over the next 12 months?</label>
+            <p class="form-hint">Roles, industries, geographies — whatever feels true. Use the dropdown if you want a starting point.</p>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Pick a common answer (optional)</label>
+            <select class="form-select" onchange="fillField('s-q2', this)">
+              <option value="">— Start from scratch —</option>
+              <option value="Land a design strategist role at a top consultancy (IDEO, frog, Designit) by mid-2027.">Land at a strategy consultancy</option>
+              <option value="Move into an in-house strategic design role at a Series B+ tech company.">Go in-house at a tech company</option>
+              <option value="Start my own design strategy consulting practice within 18 months.">Start an independent practice</option>
+              <option value="Transition into innovation or futures roles in an established company.">Move into innovation / futures work</option>
+              <option value="Get a strategy-adjacent role that builds the skills I need over 1–2 years.">Build skills in an adjacent role first</option>
+            </select>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:14px">Your answer</label>
+            <textarea class="form-textarea" id="s-q2" placeholder="Type your answer here..."></textarea>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <label class="form-label">Where are you in your career right now?</label>
+            <p class="form-hint">Tell us about your current program and prior experience. Each field accepts free text — dropdowns offer shortcuts.</p>
+
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Type of program</label>
+            <select class="form-select" id="s-q3-type">
+              <option value="MA / MFA Design Strategy">MA / MFA Design Strategy</option>
+              <option value="MBA with design focus">MBA with design focus</option>
+              <option value="MA Service Design">MA Service Design</option>
+              <option value="MA Innovation / Strategic Foresight">MA Innovation / Strategic Foresight</option>
+              <option value="Bachelor's — final year">Bachelor's — final year</option>
+              <option value="Bootcamp / certificate">Bootcamp / certificate</option>
+              <option value="Not currently enrolled">Not currently enrolled</option>
+            </select>
+
+            <div class="form-row" style="margin-top:14px">
+              <div>
+                <label class="form-label" style="font-size:12px; font-weight:500">School / institution</label>
+                <input class="form-input" id="s-q3a" placeholder="e.g. Parsons The New School" />
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px; font-weight:500">Expected graduation</label>
+                <input class="form-input" id="s-q3b" placeholder="e.g. May 2026" />
+              </div>
+            </div>
+
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Pick a common prior background (optional)</label>
+            <select class="form-select" onchange="fillField('s-q3c', this)">
+              <option value="">— Start from scratch —</option>
+              <option value="4 years as an industrial designer.">Industrial design background</option>
+              <option value="3 years as a UX/UI designer.">UX/UI design background</option>
+              <option value="5 years in architecture.">Architecture background</option>
+              <option value="2 years in marketing / brand strategy.">Marketing / brand background</option>
+              <option value="3 years as a product manager.">Product management background</option>
+              <option value="Recent graduate with internship experience.">Recent graduate</option>
+            </select>
+            <label class="form-label" style="margin-top:10px; font-size:12px; font-weight:500">Prior experience (free text)</label>
+            <textarea class="form-textarea" id="s-q3c" placeholder="Describe your background before this program..."></textarea>
+          </div>
+
+          <div class="form-step" data-step="4">
+            <label class="form-label">Your LinkedIn profile</label>
+            <p class="form-hint">Required. Atlas verifies your profile against your answers and unlocks student pricing if you're currently enrolled.</p>
+            <div class="form-link-prefix">
+              <span>linkedin.com/in/</span>
+              <input id="s-q4" placeholder="your-handle" />
+            </div>
+            <label class="form-label" style="margin-top:18px; font-size:12px; font-weight:500">Email address (used for university discount verification)</label>
+            <input class="form-input" id="s-q4-email" placeholder="you@school.edu" />
+            <p class="form-hint" style="margin-top:6px">A <strong>.edu</strong> or recognized academic email auto-unlocks the 55% student discount.</p>
+          </div>
+
+          <div class="form-step" data-step="5">
+            <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:400; letter-spacing:-0.01em; margin-bottom:14px">Review your application</div>
+            <div class="review-row"><div class="review-label">Looking for</div><div class="review-value" id="r-s-q1">—</div></div>
+            <div class="review-row"><div class="review-label">12-month goal</div><div class="review-value" id="r-s-q2">—</div></div>
+            <div class="review-row"><div class="review-label">Current program</div><div class="review-value" id="r-s-q3">—</div></div>
+            <div class="review-row"><div class="review-label">LinkedIn</div><div class="review-value" id="r-s-q4">—</div></div>
+            <div class="review-row"><div class="review-label">Email</div><div class="review-value" id="r-s-q4e">—</div></div>
+            <p class="form-hint" style="margin-top:18px">When you submit, Atlas verifies your LinkedIn, confirms your student status, and shows you the right pricing options.</p>
+          </div>
+
+          <div class="form-step" data-step="6">
+            <div class="verifying-state">
+              <div class="verifying-spinner"></div>
+              <div class="verifying-title">Verifying your profile…</div>
+              <div class="verifying-sub">Atlas is matching your LinkedIn to your answers and checking your university enrollment.</div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="7">
+            <div style="font-family:'Fraunces',serif; font-size:24px; font-weight:400; letter-spacing:-0.01em; color:var(--green); margin-bottom:8px">✓ You're verified, Sara.</div>
+            <p style="font-size:14px; color:var(--ink-2); margin:0 0 18px">Your LinkedIn confirms enrollment at Parsons. Student discount and university sponsorship are both available — pick the plan that works for you on the right.</p>
+            <p style="font-size:13px; color:var(--muted)">Already chose? <a style="color:var(--accent); font-weight:500" href="#">Open my personalized home feed →</a></p>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <div class="step-counter" id="studentStepCounter">1 of 5</div>
+          <div class="form-actions-right">
+            <button class="btn" id="studentBack" onclick="studentBack()" style="display:none">← Back</button>
+            <button class="btn btn-primary" id="studentNext" onclick="studentNext()">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-panel">
+        <div class="status-card">
+          <h4>Application checklist</h4>
+          <div id="studentChecklist">
+            <div class="checklist-item active" data-step="1"><div class="ci-icon">1</div>Your intent</div>
+            <div class="checklist-item" data-step="2"><div class="ci-icon">2</div>Career goals</div>
+            <div class="checklist-item" data-step="3"><div class="ci-icon">3</div>Current standing</div>
+            <div class="checklist-item" data-step="4"><div class="ci-icon">4</div>LinkedIn + email</div>
+            <div class="checklist-item" data-step="5"><div class="ci-icon">5</div>Review &amp; submit</div>
+          </div>
+        </div>
+
+        <div class="status-card" id="studentLinkedinCard" style="display:none">
+          <h4>LinkedIn verification</h4>
+          <div class="linkedin-card">
+            <div class="li-logo">in</div>
+            <div style="flex:1">
+              <div class="li-name">Sara Rahman</div>
+              <div class="li-headline">MA Design Strategy candidate at Parsons · Industrial Designer at Studio Drift (2020-24)</div>
+              <div class="li-stats"><span>📍 New York, NY</span><span>🔗 412 connections</span></div>
+            </div>
+          </div>
+          <div class="verify-progress" id="studentVerifyProgress">
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Match name + headline</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Verify current education</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Cross-check past experience</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Student status flag for discount</div></div>
+          </div>
+        </div>
+
+        <div class="status-card" id="studentTiersCard" style="display:none">
+          <h4>Tailored plans · student-verified</h4>
+          <p style="font-size:12px; color:var(--muted); margin:0 0 10px">Because you're enrolled at Parsons, you qualify for student pricing and university sponsorship.</p>
+          <div class="tier-stack">
+            <div class="tier-card">
+              <div class="tier-row">
+                <div class="tier-name">Free</div>
+                <div class="tier-cost">$0<small>/mo</small></div>
+              </div>
+              <div class="tier-blurb">5 questions/mo, browse all answers, save up to 10 threads.</div>
+            </div>
+            <div class="tier-card recommended">
+              <div class="tier-row">
+                <div class="tier-name">Student Plus</div>
+                <div>
+                  <span class="tier-cost strike">$9</span>
+                  <span class="tier-cost">$4<small>/mo</small></span>
+                </div>
+              </div>
+              <div class="tier-blurb">Unlimited questions, 3 direct intros/mo, portfolio reviews, mock-interview prompts.</div>
+              <span class="tier-badge">Student discount applied · 55% off</span>
+            </div>
+            <div class="tier-card">
+              <div class="tier-row">
+                <div class="tier-name">University sponsored</div>
+                <div class="tier-cost">$0<small>/you pay</small></div>
+              </div>
+              <div class="tier-blurb">If Parsons activates a cohort license, your full plan is covered. Request your career office to sponsor.</div>
+              <span class="tier-badge green">Free for you · school pays</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="outcome-card approved" id="studentOutcome" style="display:none">
+          <div class="outcome-title approved">✓ Verified &amp; personalized</div>
+          <div class="outcome-body">
+            Welcome, Sara. Based on your industrial design background and goal of moving into strategy consultancies, Atlas has curated 8 questions, 12 practitioners, and 3 portfolio reviewers most relevant to your path.
+          </div>
+          <ul class="suggestion-list" style="margin-top:14px">
+            <li><strong>Top match:</strong> Maya K. (IDEO) — 4 answers directly relevant to IDes→strategy transition</li>
+            <li><strong>Suggested first read:</strong> "How to reframe industrial design work as strategic thinking"</li>
+            <li><strong>Cohort:</strong> 14 Parsons '26 peers asking similar questions this week</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENTOR FORM -->
+    <div class="join-stage" id="flow-mentor" style="display:none">
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-title">Apply as a practitioner</div>
+          <div class="form-card-sub">6 questions + LinkedIn. Vera evaluates depth, history, and public work before approval.</div>
+          <div class="progress-bar"><div class="progress-fill" id="mentorProgressBar" style="width:14%"></div></div>
+          <div class="progress-meta"><span id="mentorStepLabel">Step 1 · Current role</span><span id="mentorProgressPct">14%</span></div>
+        </div>
+
+        <div class="form-body" id="mentorFormBody">
+
+          <div class="form-step active" data-step="1">
+            <label class="form-label">Where do you currently work, and in what role?</label>
+            <p class="form-hint">Type your current company and title. Vera cross-checks against your LinkedIn history.</p>
+            <div class="form-row">
+              <div>
+                <label class="form-label" style="font-size:12px; font-weight:500">Company / organization</label>
+                <input class="form-input" id="m-q1a" placeholder="e.g. IDEO" />
+              </div>
+              <div>
+                <label class="form-label" style="font-size:12px; font-weight:500">Your title (free text)</label>
+                <input class="form-input" id="m-q1b" placeholder="Type your title..." />
+              </div>
+            </div>
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Or pick a common title from the dropdown</label>
+            <select class="form-select" onchange="fillField('m-q1b', this)">
+              <option value="">— Type my own —</option>
+              <option value="Design Strategist">Design Strategist</option>
+              <option value="Senior Design Strategist">Senior Design Strategist</option>
+              <option value="Principal Strategist">Principal Strategist</option>
+              <option value="Strategy Director">Strategy Director</option>
+              <option value="Head of Strategy">Head of Strategy</option>
+              <option value="Innovation Consultant">Innovation Consultant</option>
+              <option value="Service Designer">Service Designer</option>
+              <option value="UX Designer">UX Designer</option>
+              <option value="Founder / Principal">Founder / Principal</option>
+            </select>
+
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">How long in this role?</label>
+            <select class="form-select" id="m-q1c">
+              <option>Less than 1 year</option>
+              <option>1–2 years</option>
+              <option>2–4 years</option>
+              <option selected>4–6 years</option>
+              <option>6+ years</option>
+            </select>
+          </div>
+
+          <div class="form-step" data-step="2">
+            <label class="form-label">How many years specifically in design strategy?</label>
+            <p class="form-hint">Strategy work — not visual, UI, or pure UX. Be honest; this is the single biggest factor in Vera's evaluation.</p>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Pick your tier</label>
+            <select class="form-select" id="m-q2">
+              <option value="0-2">0–2 years · mostly upstream framing within other roles</option>
+              <option value="2-5">2–5 years · some lead-role experience on strategy projects</option>
+              <option value="5-10" selected>5–10 years · lead-role experience, defined deliverables, repeat clients</option>
+              <option value="10+">10+ years · practice or function leader; sets standards</option>
+            </select>
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Add context (optional, free text)</label>
+            <textarea class="form-textarea" id="m-q2-context" placeholder="e.g. 6 yrs at consultancies, 2 yrs in-house..." style="min-height:60px"></textarea>
+          </div>
+
+          <div class="form-step" data-step="3">
+            <label class="form-label">How are you using design strategy in your current role?</label>
+            <p class="form-hint">Type a concrete example — one specific project or stakeholder situation. Or pick from the dropdown to use as a starting point.</p>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Common framings (optional)</label>
+            <select class="form-select" onchange="fillField('m-q3', this)">
+              <option value="">— Start from scratch —</option>
+              <option value="I lead 6–9 month engagements where we reframe a client's product question into a market or organizational one. Recent example: helped a national insurance carrier go from &quot;redesign the app&quot; to &quot;redesign the renewal moment&quot; — which shifted their roadmap by 18 months and unlocked a $40M retention strategy.">Reframing client briefs at a consultancy</option>
+              <option value="I run quarterly strategy sprints inside the company to identify which user problems are worth investing in next. I own the &quot;why now, why us&quot; narrative for two product lines.">In-house quarterly strategy work</option>
+              <option value="I do design strategy work on most projects. I help with stakeholder alignment, research, and ideation. I use frameworks like double diamond and JTBD.">Generic / framework-led (borderline)</option>
+              <option value="I lead service design engagements end-to-end — from research and synthesis through to operationalizing the recommended changes inside the client organization.">Service design lead</option>
+              <option value="I run futures research and scenario planning for clients facing 5–10 year strategic uncertainty.">Futures / scenario planning</option>
+            </select>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:14px">Your answer</label>
+            <textarea class="form-textarea" id="m-q3" placeholder="Describe how you actually use design strategy — be specific..." style="min-height:120px"></textarea>
+            <p class="form-hint" style="margin-top:6px"><strong>Why this matters:</strong> Vera reads for specificity, stakes, and decisions. Generic answers typically lead to "not approved yet."</p>
+          </div>
+
+          <div class="form-step" data-step="4">
+            <label class="form-label">How much time can you give Strata each week?</label>
+            <p class="form-hint">Answer prompts and occasionally accept intro requests. Honesty here protects your reputation and unlocks badge progression.</p>
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Pick your availability</label>
+            <select class="form-select" id="m-q4">
+              <option value="0.5">~30 min / week · 1–2 quick answers, no intros</option>
+              <option value="1">~1 hr / week · 3–4 answers, occasional intros</option>
+              <option value="2" selected>~2 hrs / week · 5–7 answers, regular intros — best for badge progression</option>
+              <option value="4">4+ hrs / week · deep contributor, fastest to Top Voice</option>
+            </select>
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Notes on your availability (optional, free text)</label>
+            <input class="form-input" id="m-q4-notes" placeholder="e.g. Mostly Tuesday/Thursday evenings PT" />
+          </div>
+
+          <div class="form-step" data-step="5">
+            <label class="form-label">What are your strongest areas?</label>
+            <p class="form-hint">Type your own or add from the dropdown. Aim for <strong>3–5 areas</strong> where you're genuinely the right person to ask. Vera flags 7+ as breadth-without-depth.</p>
+
+            <label class="form-label" style="font-size:12px; font-weight:500; margin-top:6px">Add from common areas</label>
+            <select class="form-select" id="m-q5-picker" onchange="addSkillFromSelect(this)">
+              <option value="">— Pick to add —</option>
+              <option value="Service design">Service design</option>
+              <option value="Consulting workflows">Consulting workflows</option>
+              <option value="Portfolio storytelling">Portfolio storytelling</option>
+              <option value="Career transitions">Career transitions</option>
+              <option value="Futures research">Futures research</option>
+              <option value="Strategic UX">Strategic UX</option>
+              <option value="Innovation consulting">Innovation consulting</option>
+              <option value="In-house strategy">In-house strategy</option>
+              <option value="Pitching &amp; positioning">Pitching &amp; positioning</option>
+              <option value="Research synthesis">Research synthesis</option>
+              <option value="Facilitation">Facilitation</option>
+              <option value="Org design">Org design</option>
+            </select>
+
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Or type a custom area and press Add</label>
+            <div style="display:flex; gap:8px">
+              <input class="form-input" id="m-q5-custom" placeholder="e.g. Health systems strategy" style="flex:1" />
+              <button class="btn btn-sm" type="button" onclick="addCustomSkill()">+ Add</button>
+            </div>
+
+            <label class="form-label" style="margin-top:14px; font-size:12px; font-weight:500">Your selected areas (click any to remove)</label>
+            <div class="skill-grid" id="m-q5-grid" style="min-height:50px; padding:10px; border:1px dashed var(--line); border-radius:10px"></div>
+            <div class="skill-counter" style="margin-top:8px">Selected: <strong id="m-q5-count">0</strong> · <span id="m-q5-warn"></span></div>
+          </div>
+
+          <div class="form-step" data-step="6">
+            <label class="form-label">Your LinkedIn profile</label>
+            <p class="form-hint">Required. Vera reads your full history, public posts, and any written work for evidence of strategy-level practice.</p>
+            <div class="form-link-prefix">
+              <span>linkedin.com/in/</span>
+              <input id="m-q6" placeholder="your-handle" />
+            </div>
+            <label class="form-label" style="margin-top:18px; font-size:12px; font-weight:500">Optional: link to public work (talk, article, or post)</label>
+            <input class="form-input" id="m-q6-work" placeholder="https://..." />
+            <p class="form-hint" style="margin-top:6px">Strong applications include at least one piece of public design strategy work.</p>
+          </div>
+
+          <div class="form-step" data-step="7">
+            <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:400; letter-spacing:-0.01em; margin-bottom:14px">Review your application</div>
+            <div class="review-row"><div class="review-label">Role</div><div class="review-value" id="r-m-q1">—</div></div>
+            <div class="review-row"><div class="review-label">Years in strategy</div><div class="review-value" id="r-m-q2">—</div></div>
+            <div class="review-row"><div class="review-label">How you use strategy</div><div class="review-value" id="r-m-q3">—</div></div>
+            <div class="review-row"><div class="review-label">Weekly availability</div><div class="review-value" id="r-m-q4">—</div></div>
+            <div class="review-row"><div class="review-label">Strongest areas</div><div class="review-value" id="r-m-q5">—</div></div>
+            <div class="review-row"><div class="review-label">LinkedIn</div><div class="review-value" id="r-m-q6">—</div></div>
+            <p class="form-hint" style="margin-top:18px">When you submit, Vera evaluates your application against your LinkedIn history, the depth of your answers, and any public work.</p>
+            <div style="margin-top:14px; padding:14px; background:var(--paper); border-radius:10px; border:1px dashed var(--line)">
+              <div style="font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--muted); font-weight:600; margin-bottom:6px">Demo helpers · prefill the form</div>
+              <p style="font-size:12px; color:var(--ink-2); margin:0 0 10px">Quickly populate the form to see either outcome before submitting.</p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap">
+                <button class="btn btn-sm" onclick="swapToStrong()">Use strong profile</button>
+                <button class="btn btn-sm" onclick="swapToBorderline()">Use borderline profile</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="8">
+            <div class="verifying-state">
+              <div class="verifying-spinner"></div>
+              <div class="verifying-title">Vera is evaluating your application…</div>
+              <div class="verifying-sub">Cross-checking LinkedIn, scoring answer depth, scanning public work.</div>
+            </div>
+          </div>
+
+          <div class="form-step" data-step="9" id="m-result-approved">
+            <div style="font-family:'Fraunces',serif; font-size:24px; font-weight:400; letter-spacing:-0.01em; color:var(--green); margin-bottom:8px">✓ Approved — welcome to Strata, Maya.</div>
+            <p style="font-size:14px; color:var(--ink-2); margin:0 0 16px">Vera verified 8 years of design strategy work, found your Medium piece on reframing briefs, and matched your 4 chosen skills to active question categories. You're in.</p>
+            <p style="font-size:13px; color:var(--muted); margin:0 0 6px">Your first prompt is waiting — and your contributor dashboard is set up on the right with the badges you can start earning today.</p>
+            <button class="btn btn-primary btn-sm" style="margin-top:10px">Open contributor dashboard →</button>
+          </div>
+
+          <div class="form-step" data-step="10" id="m-result-improve">
+            <div style="font-family:'Fraunces',serif; font-size:22px; font-weight:400; letter-spacing:-0.01em; color:var(--warm); margin-bottom:8px">Not approved yet — here's how to strengthen your profile.</div>
+            <p style="font-size:14px; color:var(--ink-2); margin:0 0 12px">Vera reviewed your application and isn't able to approve it right now. The platform's value depends on practitioners with deep, specific design strategy experience — and your current profile shows some gaps. Specific suggestions are on the right.</p>
+            <p style="font-size:13px; color:var(--muted)"><strong>You can reapply in 4 weeks.</strong> We'll send you a reminder on June 10, 2026 with a one-click reapply link.</p>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <div class="step-counter" id="mentorStepCounter">1 of 7</div>
+          <div class="form-actions-right">
+            <button class="btn" id="mentorBack" onclick="mentorBack()" style="display:none">← Back</button>
+            <button class="btn btn-primary" id="mentorNext" onclick="mentorNext()">Continue →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-panel">
+        <div class="status-card">
+          <h4>Application checklist</h4>
+          <div id="mentorChecklist">
+            <div class="checklist-item active" data-step="1"><div class="ci-icon">1</div>Current role</div>
+            <div class="checklist-item" data-step="2"><div class="ci-icon">2</div>Years in strategy</div>
+            <div class="checklist-item" data-step="3"><div class="ci-icon">3</div>How you use it</div>
+            <div class="checklist-item" data-step="4"><div class="ci-icon">4</div>Time availability</div>
+            <div class="checklist-item" data-step="5"><div class="ci-icon">5</div>Areas of strength</div>
+            <div class="checklist-item" data-step="6"><div class="ci-icon">6</div>LinkedIn + work</div>
+            <div class="checklist-item" data-step="7"><div class="ci-icon">7</div>Review &amp; submit</div>
+          </div>
+        </div>
+
+        <div class="status-card" id="mentorLinkedinCard" style="display:none">
+          <h4>LinkedIn verification &amp; analysis</h4>
+          <div class="linkedin-card">
+            <div class="li-logo">in</div>
+            <div style="flex:1">
+              <div class="li-name" id="mentorLiName">Maya Kapoor</div>
+              <div class="li-headline" id="mentorLiHeadline">Senior Design Strategist at IDEO · 8 yrs · Service design, futures research</div>
+              <div class="li-stats"><span>📍 San Francisco</span><span>🔗 2.4K connections</span></div>
+            </div>
+          </div>
+          <div class="verify-progress" id="mentorVerifyProgress">
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Match name + role</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Confirm 5+ yrs design strategy experience</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Cross-check claimed skills against history</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Evaluate answer depth &amp; specificity</div></div>
+            <div class="verify-row pending"><div class="vr-icon">○</div><div>Check public work (writing, talks, projects)</div></div>
+          </div>
+        </div>
+
+        <div class="status-card" id="mentorApproved" style="display:none; padding:0; overflow:hidden">
+          <div style="padding:18px; background:linear-gradient(180deg, #E2F3EC 0%, #F0F9F4 100%); border-bottom:1px solid #A7DCC4">
+            <div class="outcome-title approved" style="margin-bottom:6px">✓ Approved — welcome</div>
+            <div style="font-size:13px; color:var(--ink-2); line-height:1.5">
+              Vera matched your 4 skills to active question categories. Your first prompt is waiting.
+            </div>
+          </div>
+          <div style="padding:18px">
+            <h4 style="margin-top:0">Badges you can earn</h4>
+            <p style="font-size:12px; color:var(--muted); margin:0 0 12px">Strata recognizes time, helpfulness, and depth. Badges show on every answer you give and on your public profile.</p>
+
+            <div class="badge-explainer">
+              <span class="badge top-voice badge-large"><span class="badge-icon">⭐</span>Top Voice</span>
+              <div>
+                <div class="be-name">Strata's Top Voice</div>
+                <div class="be-criteria">Monthly award. Top 5 contributors by helpful ratings + students reached.</div>
+              </div>
+            </div>
+            <div class="badge-explainer">
+              <span class="badge helpful badge-large"><span class="badge-icon">❤</span>Most Helpful</span>
+              <div>
+                <div class="be-name">Most Helpful Voice on Strata</div>
+                <div class="be-criteria">Quarterly. Awarded when 90%+ of your answers get "very helpful" ratings.</div>
+              </div>
+            </div>
+            <div class="badge-explainer">
+              <span class="badge dedication badge-large"><span class="badge-icon">⏱</span>Dedicated Mentor</span>
+              <div>
+                <div class="be-name">Time Dedication tiers</div>
+                <div class="be-criteria">Bronze · Silver · Gold · Platinum — based on cumulative hours given.</div>
+              </div>
+            </div>
+            <div class="badge-explainer">
+              <span class="badge specialist badge-large"><span class="badge-icon">🎯</span>Specialist</span>
+              <div>
+                <div class="be-name">Topic Specialist</div>
+                <div class="be-criteria">Awarded per topic when you're the top-rated answerer in a category for 30 days.</div>
+              </div>
+            </div>
+            <div class="badge-explainer">
+              <span class="badge responder badge-large"><span class="badge-icon">⚡</span>First Responder</span>
+              <div>
+                <div class="be-name">First Responder</div>
+                <div class="be-criteria">Median response time under 24 hours across 10+ answers.</div>
+              </div>
+            </div>
+
+            <div class="dedication-meter">
+              <div style="display:flex; justify-content:space-between; align-items:baseline">
+                <div style="font-size:13px; font-weight:600">Your time dedication track</div>
+                <div style="font-size:11px; color:var(--muted)">0 hrs · just starting</div>
+              </div>
+              <div class="dedication-track"><div class="dedication-fill" style="width:0%"></div></div>
+              <div class="dedication-tiers">
+                <div class="dedication-tier active">Start</div>
+                <div class="dedication-tier">Bronze<br><span style="opacity:.6; font-size:9px">10 hrs</span></div>
+                <div class="dedication-tier">Silver<br><span style="opacity:.6; font-size:9px">30 hrs</span></div>
+                <div class="dedication-tier">Gold<br><span style="opacity:.6; font-size:9px">60 hrs</span></div>
+                <div class="dedication-tier">Platinum<br><span style="opacity:.6; font-size:9px">120 hrs</span></div>
+              </div>
+            </div>
+
+            <ul class="suggestion-list" style="margin-top:16px">
+              <li><strong>Specialty match:</strong> service design · portfolio storytelling · career transitions</li>
+              <li><strong>First prompt waiting:</strong> "How do you handle ambiguous client briefs?" (17 students)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="outcome-card improve" id="mentorImprove" style="display:none">
+          <div class="outcome-title improve">Not approved yet — here's how to strengthen your profile</div>
+          <div class="outcome-body">
+            Vera reviewed your application and isn't able to approve it right now. The platform's value depends on practitioners with deep, specific design strategy experience — and your current profile shows some gaps. Below are the specific things you can address before reapplying.
+          </div>
+          <ul class="suggestion-list">
+            <li><strong>Strengthen the design strategy signal:</strong> Your LinkedIn shows 6 yrs in UX/UI but limited evidence of strategy-level work (positioning, business framing, futures research). Add 1–2 case studies or posts showing how you've led strategic framing on a project.</li>
+            <li><strong>Deepen your answers:</strong> Your responses about how you "use design strategy today" were generic. We need concrete examples — a project, a stakeholder situation, a decision you made and why.</li>
+            <li><strong>Clarify your specialty:</strong> You selected 9 skills. Pick 3–4 where you're genuinely the person someone should ask. Breadth without depth is hard to route.</li>
+            <li><strong>Add public proof:</strong> A talk, article, or LinkedIn post on design strategy helps Vera verify your perspective. Even one post showing your thinking works.</li>
+          </ul>
+          <div class="reapply-note">
+            <strong>You can reapply in 4 weeks.</strong> Vera will look for the changes above plus any new public work. We'll send you a reminder on June 10, 2026 with a one-click reapply link.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Why these agents exist -->
+    <div class="competitive" style="margin-top:48px">
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:22px; letter-spacing:-0.01em; margin:0 0 8px">Why two agents instead of one</h3>
+      <p style="color:var(--ink-2); font-size:14px; max-width:780px; margin:0 0 16px">Students need to be welcomed and personalized. Practitioners need to be vetted carefully. Conflating those goals would either gatekeep students or dilute mentor quality. Atlas optimizes for activation; Vera optimizes for signal.</p>
+      <div class="comp-grid">
+        <div class="comp-cell">
+          <div class="comp-name">Atlas · Student agent</div>
+          <div class="comp-issue">Soft, conversational. Goal is to understand goals fast, offer the right pricing, and pre-curate the platform so the first session feels useful.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">Vera · Practitioner agent</div>
+          <div class="comp-issue">Rigorous, evidence-driven. Examines answer specificity, LinkedIn history, public work. Honest "not yet" with a clear path is more respectful than a fake yes.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">Both · LinkedIn verification</div>
+          <div class="comp-issue">No anonymous accounts. Every claim links back to a real identity. This is what makes student trust and practitioner attribution possible.</div>
+        </div>
+        <div class="comp-cell us">
+          <div class="comp-name">Together · the trust layer</div>
+          <div class="comp-issue">Asymmetric vetting on both sides protects each side from the other's worst case — and is the reason Strata can scale without losing quality.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <h2>This is a category-defining moment for design strategy.</h2>
+      <p>The field is growing faster than its infrastructure. Strata isn't just connecting students and mentors — it's building the institutional memory of a discipline that has, until now, been passed down by accident.</p>
+      <div style="display:flex; gap:10px">
+        <button class="btn">Join as a student</button>
+        <button class="btn">Contribute as a practitioner</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap footer">
+    <div class="footer-inner">
+      <div>© 2026 Strata · A platform for the design strategy community</div>
+      <div>Built with respect for the time of practitioners.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARDS (hidden — for internal reference only) -->
+<section class="section" id="dash" style="display:none !important">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Inside the product</span>
+    <h2 class="section-title">Two surfaces. <em>One ecosystem.</em></h2>
+    <p class="lede">Switch between the student and practitioner dashboards to see how Strata serves both sides — and why neither would work without the other.</p>
+
+    <div class="dash-tabs" style="margin-top:36px">
+      <div class="dash-tab active" data-dash="student" onclick="setDash('student')">🎓 Student dashboard</div>
+      <div class="dash-tab" data-dash="mentor" onclick="setDash('mentor')">💼 Practitioner dashboard</div>
+    </div>
+
+    <!-- STUDENT DASH -->
+    <div id="dash-student">
+      <div class="dash-grid">
+        <div>
+          <div class="dash-card">
+            <h4>Your trajectory</h4>
+            <div class="stat-grid">
+              <div class="stat-box">
+                <div class="stat-num">14</div>
+                <div class="stat-label">Questions asked</div>
+                <div class="stat-delta">+3 this week</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-num">47</div>
+                <div class="stat-label">Practitioners surfaced</div>
+                <div class="stat-delta">+11 this week</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-num">5</div>
+                <div class="stat-label">Direct connections</div>
+                <div class="stat-delta">+2 this week</div>
+              </div>
+            </div>
+
+            <h4 style="margin-top:24px">Most useful for you, this week</h4>
+            <div class="question-row">
+              <div class="q-icon">Q</div>
+              <div class="q-content">
+                <div class="q-title">How to talk about ambiguous projects in interviews</div>
+                <div class="q-sub">Synthesized from 6 practitioners · 3 rated very helpful</div>
+              </div>
+              <div class="q-badge">Saved</div>
+            </div>
+            <div class="question-row">
+              <div class="q-icon">Q</div>
+              <div class="q-content">
+                <div class="q-title">Should I take the IDEO offer or the in-house Visa one?</div>
+                <div class="q-sub">Synthesized from 4 practitioners · 1 follow-up call scheduled</div>
+              </div>
+              <div class="q-badge">Active</div>
+            </div>
+            <div class="question-row">
+              <div class="q-icon">Q</div>
+              <div class="q-content">
+                <div class="q-title">Difference between strategy at consultancies vs startups</div>
+                <div class="q-sub">Synthesized from 9 practitioners</div>
+              </div>
+              <div class="q-badge">Saved</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="dash-card">
+            <h4>Topics shaping your path</h4>
+            <div class="topic-bar"><div class="topic-label">Career transition</div><div class="topic-track"><div class="topic-fill" style="width:78%"></div></div><div class="topic-pct">78%</div></div>
+            <div class="topic-bar"><div class="topic-label">Portfolio &amp; positioning</div><div class="topic-track"><div class="topic-fill" style="width:62%"></div></div><div class="topic-pct">62%</div></div>
+            <div class="topic-bar"><div class="topic-label">Day-to-day reality</div><div class="topic-track"><div class="topic-fill" style="width:41%"></div></div><div class="topic-pct">41%</div></div>
+            <div class="topic-bar"><div class="topic-label">Salary &amp; negotiation</div><div class="topic-track"><div class="topic-fill" style="width:33%"></div></div><div class="topic-pct">33%</div></div>
+            <div class="topic-bar"><div class="topic-label">Geo &amp; visa</div><div class="topic-track"><div class="topic-fill" style="width:18%"></div></div><div class="topic-pct">18%</div></div>
+          </div>
+
+          <div class="dash-card" style="margin-top:18px">
+            <h4>Recent activity</h4>
+            <div class="activity-row">
+              <div class="act-dot accent"></div>
+              <div class="act-text"><strong>Maya K.</strong> accepted your 15-min async chat request</div>
+              <div class="act-time">2h</div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot green"></div>
+              <div class="act-text"><strong>3 new answers</strong> on a question you saved</div>
+              <div class="act-time">5h</div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot warm"></div>
+              <div class="act-text"><strong>Jordan T.</strong> shared a related answer</div>
+              <div class="act-time">1d</div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot accent"></div>
+              <div class="act-text">Weekly digest: <strong>4 questions trending</strong> in your cohort</div>
+              <div class="act-time">2d</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MENTOR DASH -->
+    <div id="dash-mentor" style="display:none">
+      <div class="dash-grid">
+        <div>
+          <div class="dash-card">
+            <h4>Your impact</h4>
+            <div class="stat-grid">
+              <div class="stat-box">
+                <div class="stat-num">23</div>
+                <div class="stat-label">Answers contributed</div>
+                <div class="stat-delta">+4 this month</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-num">412</div>
+                <div class="stat-label">Students reached</div>
+                <div class="stat-delta">+89 this month</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-num">94%</div>
+                <div class="stat-label">Helpful rating</div>
+                <div class="stat-delta">+2% this month</div>
+              </div>
+            </div>
+
+            <h4 style="margin-top:24px">Today's prompts — pick one, 2 minutes</h4>
+            <div class="contrib-flow" style="margin-top:0; border:none; padding:0; box-shadow:none">
+              <div class="micro-task">
+                <div class="check"></div>
+                <div class="mt-content">
+                  <div class="mt-title">What's the biggest red flag in a design strategy portfolio?</div>
+                  <div class="mt-sub">17 students waiting on this · matches your IDEO experience</div>
+                </div>
+                <div class="mt-time">~2 min</div>
+              </div>
+              <div class="micro-task">
+                <div class="check"></div>
+                <div class="mt-content">
+                  <div class="mt-title">How do you frame an ambiguous client engagement on a CV?</div>
+                  <div class="mt-sub">12 students waiting · related to your last 3 answers</div>
+                </div>
+                <div class="mt-time">~2 min</div>
+              </div>
+              <div class="micro-task done">
+                <div class="check">✓</div>
+                <div class="mt-content">
+                  <div class="mt-title">Best framework for synthesizing user research at scale</div>
+                  <div class="mt-sub">Answered · already reached 84 students</div>
+                </div>
+                <div class="mt-time">Done</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="dash-card">
+            <h4>Your knowledge graph</h4>
+            <p style="font-size:13px; color:var(--muted); margin:0 0 14px">Topics where Strata is routing students to your answers.</p>
+            <div class="topic-bar"><div class="topic-label">Service design &amp; ops</div><div class="topic-track"><div class="topic-fill" style="width:86%"></div></div><div class="topic-pct">86%</div></div>
+            <div class="topic-bar"><div class="topic-label">Consulting workflows</div><div class="topic-track"><div class="topic-fill" style="width:71%"></div></div><div class="topic-pct">71%</div></div>
+            <div class="topic-bar"><div class="topic-label">Portfolio storytelling</div><div class="topic-track"><div class="topic-fill" style="width:58%"></div></div><div class="topic-pct">58%</div></div>
+            <div class="topic-bar"><div class="topic-label">Career transitions</div><div class="topic-track"><div class="topic-fill" style="width:44%"></div></div><div class="topic-pct">44%</div></div>
+          </div>
+
+          <div class="dash-card" style="margin-top:18px">
+            <h4>This week's incoming</h4>
+            <div class="activity-row">
+              <div class="act-dot accent"></div>
+              <div class="act-text"><strong>Sara R.</strong> requested a 15-min async chat</div>
+              <div class="act-time">2h</div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot green"></div>
+              <div class="act-text"><strong>Your answer reached 31 students</strong> in cohort 2026</div>
+              <div class="act-time">1d</div>
+            </div>
+            <div class="activity-row">
+              <div class="act-dot warm"></div>
+              <div class="act-text"><strong>Featured contributor</strong> badge unlocked</div>
+              <div class="act-time">3d</div>
+            </div>
+          </div>
+
+          <div class="dash-card" style="margin-top:18px; background:var(--accent-soft); border-color:#D9D2FF">
+            <h4 style="color:var(--accent)">Why this works for you</h4>
+            <p style="font-size:13px; line-height:1.6; color:var(--ink-2); margin:0">You contribute <strong>~10 minutes per week</strong>. Strata makes your knowledge reach 50× the students one ADPlist call ever could — asynchronously, with attribution, and only escalates to real-time when you opt in.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- AI LAYER (hidden — for internal reference only) -->
+<section class="section" id="ai" style="display:none !important">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>The AI layer</span>
+    <h2 class="section-title">AI is the <em>filter, not the voice.</em></h2>
+    <p class="lede">Every word a student reads was written by a real practitioner. Strata's AI doesn't generate opinions — it indexes, retrieves, and assembles real human knowledge so the right answer reaches the right person quickly.</p>
+
+    <div class="ai-grid">
+      <div class="ai-visual">
+        <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:20px; letter-spacing:-0.01em; margin:0 0 18px">The four layers</h3>
+        <div class="ai-layer">
+          <div class="layer-num">1</div>
+          <div>
+            <div class="layer-title">Ingestion</div>
+            <div class="layer-sub">Structured prompts collect short-form practitioner answers</div>
+          </div>
+        </div>
+        <div class="ai-layer">
+          <div class="layer-num">2</div>
+          <div>
+            <div class="layer-title">Tag &amp; embed</div>
+            <div class="layer-sub">LLM categorizes by role, seniority, geo, topic + vector embeds</div>
+          </div>
+        </div>
+        <div class="ai-layer core">
+          <div class="layer-num">3</div>
+          <div>
+            <div class="layer-title">Retrieve &amp; synthesize</div>
+            <div class="layer-sub">RAG pipeline pulls top-k answers, attribution preserved</div>
+          </div>
+        </div>
+        <div class="ai-layer">
+          <div class="layer-num">4</div>
+          <div>
+            <div class="layer-title">Rank &amp; route</div>
+            <div class="layer-sub">Student feedback signals re-weight practitioner authority</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ai-points">
+        <div class="ai-point">
+          <div class="num">01</div>
+          <div>
+            <div class="ap-title">Attribution is non-negotiable</div>
+            <div class="ap-body">Every sentence in a synthesized answer links back to the original practitioner contribution. Students see who said what. Practitioners get credit for every student they reach.</div>
+          </div>
+        </div>
+        <div class="ai-point">
+          <div class="num">02</div>
+          <div>
+            <div class="ap-title">No hallucinated mentorship</div>
+            <div class="ap-body">The AI cannot invent advice. If no practitioner has answered a topic, the system surfaces that gap to relevant practitioners as a contribution prompt — turning a missed answer into incoming knowledge.</div>
+          </div>
+        </div>
+        <div class="ai-point">
+          <div class="num">03</div>
+          <div>
+            <div class="ap-title">Feedback compounds</div>
+            <div class="ap-body">"Was this helpful?" ratings, follow-up questions, and connection requests all flow back into ranking. The best practitioners surface more. Stale or generic answers fade.</div>
+          </div>
+        </div>
+        <div class="ai-point">
+          <div class="num">04</div>
+          <div>
+            <div class="ap-title">Knowledge gaps drive demand</div>
+            <div class="ap-body">When 17 students ask a variation of the same unanswered question, the system pings 3 likely-qualified practitioners with a 2-minute prompt. Demand → supply loop.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUSINESS -->
+<section class="section" id="biz" style="display:none !important">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Business model</span>
+    <h2 class="section-title">A two-sided market with <em>asymmetric pricing.</em></h2>
+    <p class="lede">Practitioners contribute free — they're the supply. Students pay for premium access. Schools and employers pay for cohort and recruiting features. The economics of mentorship, finally inverted.</p>
+
+    <div class="market-stats">
+      <div class="market-stat">
+        <div class="ms-num">~<em>180</em>K</div>
+        <div class="ms-label">Design strategy / management students globally (initial TAM)</div>
+      </div>
+      <div class="market-stat">
+        <div class="ms-num"><em>40</em>+</div>
+        <div class="ms-label">Masters programs in design strategy worldwide</div>
+      </div>
+      <div class="market-stat">
+        <div class="ms-num"><em>$1</em>2K+</div>
+        <div class="ms-label">Avg tuition per year — high willingness to pay for career outcomes</div>
+      </div>
+      <div class="market-stat">
+        <div class="ms-num">~<em>50</em>K</div>
+        <div class="ms-label">Active senior design strategists (LinkedIn estimate)</div>
+      </div>
+    </div>
+
+    <div class="biz-grid">
+      <div class="biz-card">
+        <div class="biz-name">Student · Free</div>
+        <div class="biz-price">$0<small>/forever</small></div>
+        <div class="biz-blurb">For curious students — try the platform, build a habit.</div>
+        <ul>
+          <li>5 questions per month</li>
+          <li>Browse answers from all practitioners</li>
+          <li>Save answers and follow topics</li>
+          <li>Weekly cohort digest</li>
+        </ul>
+      </div>
+
+      <div class="biz-card feature">
+        <div class="biz-name">Student · Plus</div>
+        <div class="biz-price">$9<small>/mo</small></div>
+        <div class="biz-blurb">For students serious about their next role.</div>
+        <ul>
+          <li>Unlimited questions</li>
+          <li>3 direct intro requests per month</li>
+          <li>Portfolio reviews from 2+ practitioners</li>
+          <li>Mock interview prompt bank</li>
+          <li>Cohort-only thread access</li>
+        </ul>
+      </div>
+
+      <div class="biz-card">
+        <div class="biz-name">Schools &amp; programs</div>
+        <div class="biz-price">$8K<small>/cohort/yr</small></div>
+        <div class="biz-blurb">For masters programs that want to prove placement outcomes.</div>
+        <ul>
+          <li>Whole-cohort access to Strata Plus</li>
+          <li>Program-branded onboarding</li>
+          <li>Outcome dashboards for career services</li>
+          <li>Alumni network seeding tools</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="gtm-wrap">
+      <span class="eyebrow"><span class="dot"></span>Go-to-market</span>
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:26px; letter-spacing:-0.01em; margin:10px 0 4px">Three phases, each unlocking the next.</h3>
+      <p style="color:var(--muted); font-size:14px; margin:0 0 6px; max-width:700px">Design strategy is small enough to seed by hand. The first 200 practitioners and 1,000 students create the gravitational pull for everyone after.</p>
+
+      <div class="gtm-phases">
+        <div class="gtm-phase p1">
+          <div class="gtm-label">Phase 1 · 0–6 months</div>
+          <div class="gtm-title">Seed the supply side</div>
+          <div class="gtm-body">Recruit 100 senior practitioners via direct outreach (LinkedIn, alumni networks of top programs). Pay nothing in cash — give them attribution, recognition, and beta-shaper status. Build a corpus of ~1,500 answers across the 40 most-asked questions.</div>
+        </div>
+        <div class="gtm-phase p2">
+          <div class="gtm-label">Phase 2 · 6–18 months</div>
+          <div class="gtm-title">Activate cohorts</div>
+          <div class="gtm-body">Partner with 3-5 masters programs (IIT-ID, Parsons, RCA, CIID, IIAD). Free Strata Plus for the cohort in exchange for being design partners. Use placement outcomes as case studies. Begin paid student conversion.</div>
+        </div>
+        <div class="gtm-phase p3">
+          <div class="gtm-label">Phase 3 · 18+ months</div>
+          <div class="gtm-title">Expand adjacent</div>
+          <div class="gtm-body">Open to service design, innovation, and strategic UX students. Add employer features (anonymous talent surfacing, role posting). Begin India + EU + US regional sub-communities. Knowledge corpus becomes the moat.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="competitive" style="margin-top:40px">
+      <h3 style="font-family:'Fraunces',serif; font-weight:400; font-size:22px; letter-spacing:-0.01em; margin:0 0 8px">The defensibility question</h3>
+      <p style="color:var(--ink-2); font-size:14px; max-width:780px; margin:0 0 16px">Why won't LinkedIn or ADPlist just copy this?</p>
+      <div class="comp-grid">
+        <div class="comp-cell">
+          <div class="comp-name">Specialist corpus</div>
+          <div class="comp-issue">Generic platforms can't match the density of design-strategy-specific answers without spending 2+ years building it.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">Practitioner trust</div>
+          <div class="comp-issue">Senior strategists contribute because the platform respects their time. Generic platforms demand calls.</div>
+        </div>
+        <div class="comp-cell">
+          <div class="comp-name">School relationships</div>
+          <div class="comp-issue">Multi-year contracts with masters programs lock in cohort distribution.</div>
+        </div>
+        <div class="comp-cell us">
+          <div class="comp-name">Feedback flywheel</div>
+          <div class="comp-issue">Every student rating and connection trains the routing model. Latecomers start cold.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <h2>This is a category-defining moment for design strategy.</h2>
+      <p>The field is growing faster than its infrastructure. Strata isn't just connecting students and mentors — it's building the institutional memory of a discipline that has, until now, been passed down by accident.</p>
+      <div style="display:flex; gap:10px">
+        <button class="btn">Join as a student</button>
+        <button class="btn">Contribute as a practitioner</button>
+        <button class="btn btn-ghost">For schools →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap footer">
+    <div class="footer-inner">
+      <div>© 2026 Strata · A concept prototype for the design strategy community</div>
+      <div>Built with respect for the time of practitioners.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP (hidden — for internal reference only) -->
+<section class="section" id="road" style="display:none !important">
+  <div class="wrap">
+    <span class="eyebrow"><span class="dot"></span>Roadmap</span>
+    <h2 class="section-title">From <em>handcrafted to compounding.</em></h2>
+    <p class="lede">A staged build that prioritizes corpus quality and trust before scaling. Each quarter unlocks a specific user value.</p>
+
+    <div class="roadmap">
+      <div class="road-row">
+        <div class="road-quarter">Q3 2026 <small>Foundation</small></div>
+        <div class="road-items">
+          <div class="road-item done">✓ Brand, positioning, landing</div>
+          <div class="road-item done">✓ First 25 practitioner interviews</div>
+          <div class="road-item done">✓ Question taxonomy v1</div>
+          <div class="road-item">Closed beta — 1 cohort, 1 program</div>
+          <div class="road-item">RAG pipeline v1</div>
+        </div>
+      </div>
+
+      <div class="road-row">
+        <div class="road-quarter">Q4 2026 <small>Beta</small></div>
+        <div class="road-items">
+          <div class="road-item">100 practitioners onboarded</div>
+          <div class="road-item">Web app v1</div>
+          <div class="road-item">Attribution + ranking system</div>
+          <div class="road-item">Async intro request flow</div>
+          <div class="road-item">Cohort digest emails</div>
+        </div>
+      </div>
+
+      <div class="road-row">
+        <div class="road-quarter">Q1 2027 <small>Open launch</small></div>
+        <div class="road-items">
+          <div class="road-item">Public student signup</div>
+          <div class="road-item">Stripe — Student Plus</div>
+          <div class="road-item">3 program partnerships signed</div>
+          <div class="road-item">Mobile-first interface</div>
+          <div class="road-item">Portfolio review feature</div>
+        </div>
+      </div>
+
+      <div class="road-row">
+        <div class="road-quarter">Q2 2027 <small>Cohort scale</small></div>
+        <div class="road-items">
+          <div class="road-item">5,000 students</div>
+          <div class="road-item">300 practitioners</div>
+          <div class="road-item">Outcome dashboards (school B2B)</div>
+          <div class="road-item">India + EU regional content</div>
+          <div class="road-item">First Series A conversations</div>
+        </div>
+      </div>
+
+      <div class="road-row">
+        <div class="road-quarter">Q4 2027 <small>Adjacent</small></div>
+        <div class="road-items">
+          <div class="road-item">Service design + innovation expansion</div>
+          <div class="road-item">Employer talent layer</div>
+          <div class="road-item">Mentor-led mini-cohort feature</div>
+          <div class="road-item">API for school career services</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <h2>This is a category-defining moment for design strategy.</h2>
+      <p>The field is growing faster than its infrastructure. Strata isn't just connecting students and mentors — it's building the institutional memory of a discipline that has, until now, been passed down by accident.</p>
+      <div style="display:flex; gap:10px">
+        <button class="btn">Join as a student</button>
+        <button class="btn">Contribute as a practitioner</button>
+        <button class="btn btn-ghost">For schools →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap footer">
+    <div class="footer-inner">
+      <div>© 2026 Strata · A concept prototype for the design strategy community</div>
+      <div>Built with respect for the time of practitioners.</div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Tab navigation
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section');
+  function goTo(target){
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.target === target));
+    sections.forEach(s => s.classList.toggle('active', s.id === target));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  tabs.forEach(t => t.addEventListener('click', () => goTo(t.dataset.target)));
+
+  // Dashboard toggle
+  function setDash(which){
+    document.querySelectorAll('.dash-tab').forEach(d => d.classList.toggle('active', d.dataset.dash === which));
+    document.getElementById('dash-student').style.display = which === 'student' ? '' : 'none';
+    document.getElementById('dash-mentor').style.display = which === 'mentor' ? '' : 'none';
+  }
+
+  // Answer mock data
+  const answers = {
+    q1: {
+      input: "Coming from architecture — am I a fit for strategy roles?",
+      summary: "Architects are <strong>strong candidates</strong> for design strategy, but most miss the framing in their portfolio. Practitioners consistently say: <strong>lean into systems thinking, scale, and stakeholder navigation</strong> — three things architects do natively but rarely call out. The roles most open to architecture backgrounds are <strong>service design, innovation consulting, and urban/spatial strategy at firms like IDEO, Dark Matter Labs, and SOM Strategy</strong>. Avoid pitching yourself as a 'recovering architect' — frame it as the foundation your strategy practice is built on.",
+      sources: 6,
+      contributions: [
+        {av:'av-2', name:'Maya K.', role:'Senior Strategist · IDEO · 8 yrs', body:'"The strongest portfolios I see from architecture backgrounds are the ones that don\'t apologize for it. Show me how you held a 30-stakeholder municipal project together — that\'s strategy. Don\'t hide it under a UX case study."', stats:'42 helpful · 18 connects', connect:true},
+        {av:'av-3', name:'Jordan T.', role:'Founder · Dark Matter Labs', body:'"Architects already think in systems, time, and scale. The skill gap is usually narrative framing for non-spatial audiences. Spend 2 weeks rewriting one case study for a strategy lens — that\'s your differentiator."', stats:'31 helpful · 9 connects', connect:true},
+        {av:'av-4', name:'Alex P.', role:'Strategy Director · frog', body:'"Don\'t apply for junior UX roles to "break in" — you\'ll get pigeonholed. Apply for service design and senior strategist roles. Your tenure in architecture counts. We hired two from your background last year."', stats:'28 helpful · 12 connects', connect:false}
+      ]
+    },
+    q2: {
+      input: "What does a strategist actually do day-to-day?",
+      summary: "There is no single day-to-day — and practitioners agree this is precisely what makes the role hard to explain to recruiters. The closest pattern: <strong>30% research synthesis, 30% facilitation and stakeholder management, 20% concept and artifact creation, 20% selling the work internally</strong>. Senior strategists spend more time on the last bucket; juniors more on the first two. The role is <strong>less about ideas and more about creating shared conviction</strong> — at consultancies you do this for clients; in-house, for your own leadership.",
+      sources: 9,
+      contributions: [
+        {av:'av-5', name:'Dani C.', role:'Principal Strategist · Designit', body:'"On a typical Tuesday I\'m running a synthesis workshop in the morning, writing a strategic narrative for a client steering committee at lunch, and arguing with engineering about scope at 4pm. The strategy is the connective tissue across all of it."', stats:'67 helpful · 21 connects', connect:true},
+        {av:'av-6', name:'Priya N.', role:'Head of Strategy · Series B startup', body:'"In-house is different. Less variety, more depth. You own a domain for 6-18 months. Your job is to make the org believe in the path you\'ve mapped — which means a lot of decks, walkthroughs, and 1:1s with execs. Less workshops, more memos."', stats:'54 helpful · 19 connects', connect:true},
+        {av:'av-2', name:'Maya K.', role:'Senior Strategist · IDEO', body:'"The unglamorous truth: 40% of my week is just keeping projects unstuck. Calendar tetris, alignment emails, reframing a question someone asked badly. Real strategy work is maybe 15 hours a week. Plan accordingly."', stats:'48 helpful · 14 connects', connect:false}
+      ]
+    },
+    q3: {
+      input: "Should I niche down or stay generalist?",
+      summary: "Practitioners are split — but the split is <strong>generational and timing-based</strong>, not philosophical. The consensus: <strong>generalist for years 0-4, niche for years 5+</strong>. Early career, breadth gives you the pattern-matching that makes you valuable. Mid-career, depth in a sector (health, mobility, climate, fintech) or a method (futures, service design, behavioral) is what creates pricing power and clarity for hiring managers.",
+      sources: 7,
+      contributions: [
+        {av:'av-3', name:'Jordan T.', role:'Founder · Dark Matter Labs', body:'"The strategists who never niche end up looking like consultants in their 40s — generic and undifferentiated. The ones who niche too early get stuck in one vertical. Three years of breadth, then go deep on something specific."', stats:'52 helpful · 17 connects', connect:true},
+        {av:'av-4', name:'Alex P.', role:'Strategy Director · frog', body:'"I hire generalists for senior roles and specialists for principal roles. Different jobs. Don\'t pick a niche before you know what energizes you — you\'ll resent it within 18 months."', stats:'39 helpful · 11 connects', connect:false},
+        {av:'av-6', name:'Priya N.', role:'Head of Strategy · Series B startup', body:'"Niche by problem, not by industry. \'I help orgs commercialize emerging tech\' is portable. \'I do strategy for fintech\' locks you out of half the market."', stats:'45 helpful · 13 connects', connect:true}
+      ]
+    },
+    q4: {
+      input: "How do I make my portfolio strategic, not just visual?",
+      summary: "Every practitioner who has hired says the same thing: <strong>portfolios are over-designed and under-argued</strong>. The fix is structural — every case study should answer four questions in order: <strong>(1) what was the ambiguity, (2) how did you reframe it, (3) what did you decide to make, (4) what changed because of that</strong>. Visuals are evidence, not the argument. Cut polish; add reasoning.",
+      sources: 8,
+      contributions: [
+        {av:'av-2', name:'Maya K.', role:'Senior Strategist · IDEO', body:'"I open a strategy portfolio and look for one thing: did you make a hard choice and explain why? If every option you considered survived to the final design, you didn\'t strategize — you decorated."', stats:'71 helpful · 24 connects', connect:true},
+        {av:'av-5', name:'Dani C.', role:'Principal Strategist · Designit', body:'"Show your synthesis artifacts — the messy whiteboards, the framework you invented and then threw away. The thinking is the deliverable, not the final visual. I literally skip the hero image."', stats:'63 helpful · 18 connects', connect:true},
+        {av:'av-3', name:'Jordan T.', role:'Founder · Dark Matter Labs', body:'"Write a 200-word intro to every case study that could stand alone as a strategy memo. If a non-designer can\'t understand the value of the project from those 200 words, redo it."', stats:'58 helpful · 16 connects', connect:false}
+      ]
+    }
+  };
+
+  function loadAnswer(qid){
+    // Set chip active
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.q === qid));
+    const data = answers[qid];
+    if (!data) return;
+
+    document.getElementById('askInput').value = data.input;
+    const area = document.getElementById('answerArea');
+    area.innerHTML = '';
+
+    // AI summary card
+    const summary = document.createElement('div');
+    summary.className = 'answer-card ai-summary';
+    summary.innerHTML = `
+      <div class="ai-tag"><span class="pulse"></span>AI · synthesized from ${data.sources} practitioners</div>
+      <div class="summary-text">${data.summary}</div>
+      <div class="source-count">
+        <div class="source-avatars">
+          ${data.contributions.map(c => `<div class="avatar ${c.av}">${c.name.split(' ')[0][0]}${c.name.split(' ')[1][0]}</div>`).join('')}
+          <div class="avatar" style="background:var(--ink-2)">+${data.sources - data.contributions.length}</div>
+        </div>
+        <span>Tap any name below to see their original answer</span>
+      </div>
+    `;
+    area.appendChild(summary);
+
+    // Individual contributions
+    data.contributions.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'answer-card';
+      const initials = c.name.split(' ').map(p => p[0]).join('');
+      card.innerHTML = `
+        <div class="contrib-head">
+          <div class="avatar ${c.av}">${initials}</div>
+          <div class="contrib-meta">
+            <div class="contrib-name">${c.name} <span class="verified" title="verified practitioner">✓</span></div>
+            <div class="contrib-role">${c.role}</div>
+            <div class="contrib-stats">${c.stats}</div>
+          </div>
+        </div>
+        <div class="contrib-body"><p>${c.body}</p></div>
+        <div class="contrib-tail">
+          ${c.connect
+            ? '<span class="open-to-connect">Open to a 15-min async chat</span><button class="btn btn-sm">Request intro →</button>'
+            : '<span style="font-size:12px; color:var(--muted)">Not currently accepting 1:1s</span><button class="btn btn-sm btn-ghost">Save answer</button>'}
+        </div>
+      `;
+      area.appendChild(card);
+    });
+  }
+
+  function runAsk(){
+    // For demo, just load q1 if user types something
+    const val = document.getElementById('askInput').value.toLowerCase();
+    if (val.includes('architecture')) loadAnswer('q1');
+    else if (val.includes('day') || val.includes('do')) loadAnswer('q2');
+    else if (val.includes('niche') || val.includes('generalist')) loadAnswer('q3');
+    else if (val.includes('portfolio')) loadAnswer('q4');
+    else loadAnswer('q1');
+  }
+
+  // Initial load
+  loadAnswer('q1');
+
+  /* ============================================
+     JOIN STRATA — Profile creation forms
+     ============================================ */
+
+  // Toggle between student and mentor sign-up forms
+  function setFlow(which){
+    document.querySelectorAll('.join-toggle-opt').forEach(o => o.classList.toggle('active', o.dataset.flow === which));
+    document.getElementById('flow-student').style.display = which === 'student' ? '' : 'none';
+    document.getElementById('flow-mentor').style.display = which === 'mentor' ? '' : 'none';
+  }
+
+  // ---- Student form state ----
+  const studentStepLabels = ["Your intent","Career goals","Current standing","LinkedIn + email","Review &amp; submit","Verifying…","You're in"];
+  let studentStep = 1;
+  const studentMaxStep = 5; // user-facing steps (submission triggers 6,7)
+
+  function setStudentStep(n){
+    studentStep = n;
+    document.querySelectorAll('#studentFormBody .form-step').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.step) === n);
+    });
+    const visibleN = Math.min(n, studentMaxStep);
+    const pct = Math.round((Math.min(n, studentMaxStep) / studentMaxStep) * 100);
+    document.getElementById('studentProgressBar').style.width = (n <= studentMaxStep ? pct : 100) + '%';
+    document.getElementById('studentProgressPct').textContent = (n <= studentMaxStep ? pct : 100) + '%';
+    document.getElementById('studentStepLabel').textContent = `Step ${visibleN} · ${studentStepLabels[Math.min(n-1, studentStepLabels.length-1)]}`;
+    document.getElementById('studentStepCounter').textContent = (n <= studentMaxStep) ? `${n} of ${studentMaxStep}` : (n === 6 ? 'Verifying' : 'Verified');
+
+    // Checklist
+    document.querySelectorAll('#studentChecklist .checklist-item').forEach(ci => {
+      const s = parseInt(ci.dataset.step);
+      ci.classList.remove('done','active');
+      if (n > studentMaxStep) ci.classList.add('done');
+      else if (s < n) ci.classList.add('done');
+      else if (s === n) ci.classList.add('active');
+    });
+
+    // Buttons
+    document.getElementById('studentBack').style.display = (n > 1 && n <= studentMaxStep) ? '' : 'none';
+    const nextBtn = document.getElementById('studentNext');
+    if (n < studentMaxStep) { nextBtn.style.display=''; nextBtn.textContent = 'Continue →'; }
+    else if (n === studentMaxStep) { nextBtn.style.display=''; nextBtn.textContent = 'Submit for verification →'; }
+    else if (n === 6) { nextBtn.style.display='none'; }
+    else { nextBtn.style.display=''; nextBtn.textContent = 'Go to home feed →'; nextBtn.onclick = () => alert('Demo: this would open your personalized home feed.'); }
+  }
+
+  function studentNext(){
+    if (studentStep === studentMaxStep) {
+      // Fill review then submit
+      fillStudentReview();
+      submitStudent();
+      return;
+    }
+    if (studentStep === 4) {
+      // Going from LinkedIn step to review
+      fillStudentReview();
+    }
+    setStudentStep(studentStep + 1);
+  }
+  function studentBack(){
+    if (studentStep > 1) setStudentStep(studentStep - 1);
+  }
+  function fillStudentReview(){
+    document.getElementById('r-s-q1').textContent = document.getElementById('s-q1').value || '—';
+    document.getElementById('r-s-q2').textContent = document.getElementById('s-q2').value || '—';
+    const ptype = document.getElementById('s-q3-type').value;
+    const school = document.getElementById('s-q3a').value;
+    const grad = document.getElementById('s-q3b').value;
+    const prior = document.getElementById('s-q3c').value;
+    document.getElementById('r-s-q3').textContent = [ptype, school, grad, prior].filter(Boolean).join(' · ') || '—';
+    document.getElementById('r-s-q4').textContent = `linkedin.com/in/${document.getElementById('s-q4').value || '—'}`;
+    document.getElementById('r-s-q4e').textContent = document.getElementById('s-q4-email').value || '—';
+  }
+  function submitStudent(){
+    setStudentStep(6); // verifying
+    // Show LinkedIn card and run verification animation
+    document.getElementById('studentLinkedinCard').style.display = '';
+    runVerify('#studentVerifyProgress .verify-row', null, () => {
+      // verification done — show tiers card and move to result step
+      document.getElementById('studentTiersCard').style.display = '';
+      document.getElementById('studentOutcome').style.display = '';
+      setStudentStep(7);
+    });
+  }
+
+  // ---- Mentor form state ----
+  const mentorStepLabels = ["Current role","Years in strategy","How you use it","Time availability","Areas of strength","LinkedIn + work","Review &amp; submit","Evaluating…","Decision"];
+  let mentorStep = 1;
+  const mentorMaxStep = 7;
+
+  function setMentorStep(n){
+    mentorStep = n;
+    document.querySelectorAll('#mentorFormBody .form-step').forEach(s => {
+      s.classList.toggle('active', parseInt(s.dataset.step) === n);
+    });
+    const visibleN = Math.min(n, mentorMaxStep);
+    const pct = Math.round((visibleN / mentorMaxStep) * 100);
+    document.getElementById('mentorProgressBar').style.width = (n <= mentorMaxStep ? pct : 100) + '%';
+    document.getElementById('mentorProgressPct').textContent = (n <= mentorMaxStep ? pct : 100) + '%';
+    document.getElementById('mentorStepLabel').textContent = `Step ${visibleN} · ${mentorStepLabels[Math.min(n-1, mentorStepLabels.length-1)]}`;
+    document.getElementById('mentorStepCounter').textContent = (n <= mentorMaxStep) ? `${n} of ${mentorMaxStep}` : (n === 8 ? 'Evaluating' : 'Decision');
+
+    // Checklist
+    document.querySelectorAll('#mentorChecklist .checklist-item').forEach(ci => {
+      const s = parseInt(ci.dataset.step);
+      ci.classList.remove('done','active');
+      if (n > mentorMaxStep) ci.classList.add('done');
+      else if (s < n) ci.classList.add('done');
+      else if (s === n) ci.classList.add('active');
+    });
+
+    // Buttons
+    document.getElementById('mentorBack').style.display = (n > 1 && n <= mentorMaxStep) ? '' : 'none';
+    const nextBtn = document.getElementById('mentorNext');
+    if (n < mentorMaxStep) { nextBtn.style.display=''; nextBtn.textContent = 'Continue →'; nextBtn.onclick = mentorNext; }
+    else if (n === mentorMaxStep) { nextBtn.style.display=''; nextBtn.textContent = 'Submit for evaluation →'; nextBtn.onclick = mentorNext; }
+    else if (n === 8) { nextBtn.style.display='none'; }
+    else { nextBtn.style.display=''; nextBtn.textContent = 'Done'; nextBtn.onclick = () => alert('Demo: this would open the contributor dashboard or reapplication tracker.'); }
+  }
+
+  function mentorNext(){
+    if (mentorStep === mentorMaxStep) {
+      fillMentorReview();
+      submitMentor();
+      return;
+    }
+    if (mentorStep === 6) fillMentorReview();
+    setMentorStep(mentorStep + 1);
+  }
+  function mentorBack(){
+    if (mentorStep > 1) setMentorStep(mentorStep - 1);
+  }
+
+  // Fill a textarea/input from a dropdown selection
+  function fillField(targetId, selectEl){
+    if (!selectEl.value) return;
+    const target = document.getElementById(targetId);
+    if (target) target.value = selectEl.value;
+    // reset the select so the user can pick again
+    selectEl.selectedIndex = 0;
+  }
+
+  // Skills: add from dropdown, add custom, remove on click
+  function addSkill(name){
+    if (!name) return;
+    const grid = document.getElementById('m-q5-grid');
+    // Avoid duplicates
+    const existing = Array.from(grid.querySelectorAll('.skill-chip')).map(c => c.textContent.trim().toLowerCase());
+    if (existing.includes(name.trim().toLowerCase())) return;
+    const chip = document.createElement('div');
+    chip.className = 'skill-chip selected';
+    chip.textContent = name;
+    chip.title = 'Click to remove';
+    chip.onclick = function(){ chip.remove(); updateSkillCount(); };
+    grid.appendChild(chip);
+    updateSkillCount();
+  }
+  function addSkillFromSelect(sel){
+    if (sel.value) {
+      addSkill(sel.value.replace(/&amp;/g, '&'));
+      sel.selectedIndex = 0;
+    }
+  }
+  function addCustomSkill(){
+    const input = document.getElementById('m-q5-custom');
+    if (input.value.trim()) {
+      addSkill(input.value.trim());
+      input.value = '';
+    }
+  }
+  function updateSkillCount(){
+    const count = document.querySelectorAll('#m-q5-grid .skill-chip').length;
+    document.getElementById('m-q5-count').textContent = count;
+    const warn = document.getElementById('m-q5-warn');
+    if (count > 6) warn.innerHTML = '<span style="color:var(--warm); font-weight:500">Breadth flag · narrow to 3–5 for a stronger application</span>';
+    else if (count < 2) warn.innerHTML = '<span style="color:var(--muted)">Add at least 2</span>';
+    else if (count >= 3 && count <= 5) warn.innerHTML = '<span style="color:var(--green); font-weight:500">Good — focused selection</span>';
+    else warn.innerHTML = '';
+  }
+
+  function fillMentorReview(){
+    const company = document.getElementById('m-q1a').value || '—';
+    const title = document.getElementById('m-q1b').value || '—';
+    const tenure = document.getElementById('m-q1c').value;
+    document.getElementById('r-m-q1').textContent = `${title} at ${company} (${tenure})`;
+    const yrsSelect = document.getElementById('m-q2');
+    const yrsLabel = yrsSelect.options[yrsSelect.selectedIndex].text;
+    const yrsContext = document.getElementById('m-q2-context').value;
+    document.getElementById('r-m-q2').textContent = yrsLabel + (yrsContext ? ' — ' + yrsContext : '');
+    document.getElementById('r-m-q3').textContent = document.getElementById('m-q3').value || '—';
+    const hrsSelect = document.getElementById('m-q4');
+    const hrsLabel = hrsSelect.options[hrsSelect.selectedIndex].text;
+    const hrsNotes = document.getElementById('m-q4-notes').value;
+    document.getElementById('r-m-q4').textContent = hrsLabel + (hrsNotes ? ' — ' + hrsNotes : '');
+    const skills = Array.from(document.querySelectorAll('#m-q5-grid .skill-chip')).map(c => c.textContent).join(', ');
+    document.getElementById('r-m-q5').textContent = skills || '—';
+    document.getElementById('r-m-q6').textContent = `linkedin.com/in/${document.getElementById('m-q6').value || '—'}`;
+  }
+
+  function swapToStrong(){
+    document.getElementById('m-q1a').value = 'IDEO';
+    document.getElementById('m-q1b').value = 'Senior Design Strategist';
+    document.getElementById('m-q1c').selectedIndex = 3; // 4-6 years
+    document.getElementById('m-q2').value = '5-10';
+    document.getElementById('m-q2-context').value = '6 yrs at consultancies, 2 yrs in-house.';
+    document.getElementById('m-q3').value = 'I lead 6–9 month engagements where we reframe a client\'s product question into a market or organizational one. Recent example: helped a national insurance carrier go from "redesign the app" to "redesign the renewal moment" — which shifted their roadmap by 18 months and unlocked a $40M retention strategy.';
+    document.getElementById('m-q4').value = '2';
+    document.getElementById('m-q4-notes').value = 'Mostly Tuesday/Thursday evenings PT.';
+    document.getElementById('m-q6').value = 'maya-kapoor';
+    document.getElementById('m-q6-work').value = 'https://medium.com/@mayakapoor/reframing-the-brief';
+    document.getElementById('m-q5-grid').innerHTML = '';
+    ['Service design','Consulting workflows','Portfolio storytelling','Career transitions'].forEach(s => addSkill(s));
+    fillMentorReview();
+    alert('Strong profile loaded. Submit to see the approval + badges path.');
+  }
+
+  function swapToBorderline(){
+    document.getElementById('m-q1a').value = 'Acme Fintech';
+    document.getElementById('m-q1b').value = 'Senior UX Designer';
+    document.getElementById('m-q1c').selectedIndex = 1;
+    document.getElementById('m-q2').value = '0-2';
+    document.getElementById('m-q2-context').value = 'Mostly strategy-adjacent work in UX role.';
+    document.getElementById('m-q3').value = 'I do design strategy work on most projects. I help with stakeholder alignment, research, and ideation. I use a lot of frameworks like double diamond and JTBD.';
+    document.getElementById('m-q4').value = '0.5';
+    document.getElementById('m-q4-notes').value = '';
+    document.getElementById('m-q6').value = 'maya-kapoor-ux';
+    document.getElementById('m-q6-work').value = '';
+    // Reset skills then add 9 to trigger breadth flag
+    document.getElementById('m-q5-grid').innerHTML = '';
+    ['UX/UI','Research','Ideation','Product','Service design','Prototyping','Workshops','Strategy','Careers'].forEach(s => addSkill(s));
+    fillMentorReview();
+    alert('Borderline profile loaded. Continue to submit to see the "not approved yet" path with improvement suggestions.');
+  }
+
+  function submitMentor(){
+    setMentorStep(8); // evaluating
+    document.getElementById('mentorLinkedinCard').style.display = '';
+    // Borderline detection
+    const yrs = document.getElementById('m-q2').value;
+    const role = document.getElementById('m-q1b').value.toLowerCase();
+    const answerLength = document.getElementById('m-q3').value.length;
+    const skills = document.querySelectorAll('#m-q5-grid .skill-chip').length;
+    const hasPublic = document.getElementById('m-q6-work').value.trim().length > 0;
+    const isWeak = (yrs === '0-2') || role.includes('ux designer') || answerLength < 200 || skills >= 7 || !hasPublic;
+
+    if (isWeak){
+      document.getElementById('mentorLiName').textContent = 'Maya Kapoor';
+      document.getElementById('mentorLiHeadline').textContent = 'Senior UX Designer · 6 yrs · UX/UI, research, ideation';
+    }
+
+    runVerify('#mentorVerifyProgress .verify-row', isWeak ? (yrs === '0-2' ? 1 : 3) : -1, () => {
+      if (isWeak){
+        // show improvement card on right
+        document.getElementById('mentorImprove').style.display = '';
+        setMentorStep(10);
+      } else {
+        document.getElementById('mentorApproved').style.display = '';
+        setMentorStep(9);
+      }
+    });
+  }
+
+  // Generic LinkedIn verification animation
+  function runVerify(selector, failIndex, done){
+    const rows = document.querySelectorAll(selector);
+    rows.forEach(row => { row.classList.remove('checking','passed','failed'); row.classList.add('pending'); row.querySelector('.vr-icon').textContent = '○'; });
+    let i = 0;
+    const step = () => {
+      if (i > 0){
+        rows[i-1].classList.remove('checking');
+        if (i-1 === failIndex) { rows[i-1].classList.add('failed'); rows[i-1].querySelector('.vr-icon').textContent = '!'; }
+        else { rows[i-1].classList.add('passed'); rows[i-1].querySelector('.vr-icon').textContent = '✓'; }
+      }
+      if (i < rows.length){
+        rows[i].classList.remove('pending');
+        rows[i].classList.add('checking');
+        rows[i].querySelector('.vr-icon').textContent = '';
+        i++;
+        setTimeout(step, 650);
+      } else if (done) {
+        setTimeout(done, 400);
+      }
+    };
+    step();
+  }
+
+  // Init forms
+  setStudentStep(1);
+  setMentorStep(1);
+  updateSkillCount();
+
+  /* ============================================
+     [Legacy chat-based onboarding — dormant, kept for reference]
+     ============================================ */
+
+  // Wrap in a function that is never called so DOM refs don't fire
+  function __legacyOnboardingDormant(){
+  if (false) {
+  // ---- (Legacy) Student flow (Atlas) ----
+  const studentScript = [
+    { agent: "Hi! I'm Atlas, your onboarding agent. I'll ask 5 quick questions, verify your LinkedIn, then tailor Strata to your goals. Ready?", replies: [{label:"Let's go →", next:true}] },
+    { agent: "First — what brought you to Strata? What are you hoping to find here?", step:1, replies: [
+        {label:"Career direction after my masters", value:"I'm finishing my MA in Design Strategy and trying to figure out what roles fit my background."},
+        {label:"Honest advice from people in the field", value:"I want to hear from people doing the work — not LinkedIn fluff."},
+        {label:"Portfolio &amp; interview help", value:"I need someone to review my work and prep me for strategy interviews."}
+      ]},
+    { agent: "Got it. What's your goal — say, 12 months from now?", step:2, replies: [
+        {label:"Land a strategy role at a consultancy", value:"I want to land a design strategist role at IDEO, frog, or Designit by mid-2027."},
+        {label:"Move in-house at a tech company", value:"I'd like to move into an in-house strategic design role at a Series B+ company."},
+        {label:"Start my own practice", value:"I want to freelance/consult independently within 18 months."}
+      ]},
+    { agent: "Where are you in your career right now? Background, current role/program — whatever feels relevant.", step:3, replies: [
+        {label:"Use my example answer", value:"I have 4 years in industrial design at Studio Drift in Amsterdam. Currently in my second semester at Parsons MFA Design Strategy, graduating May 2026."}
+      ]},
+    { agent: "Last input — drop your LinkedIn URL so I can verify and personalize.", step:4, replies: [
+        {label:"linkedin.com/in/sara-rahman", value:"linkedin.com/in/sara-rahman", verify:'student'}
+      ]},
+    { agent: "Profile verified. I can see you're enrolled at Parsons — that unlocks student pricing, and you can also request your university to sponsor your full access. Here are your options:", step:5, showTiers:true, replies: [
+        {label:"Continue with Student Plus →", value:"Going with Student Plus.", finalize:'student'}
+      ]},
+    { agent: "You're in, Sara! I've already pre-curated your home feed. Take a look at your tailored experience on the right — and ask your first question whenever you're ready.", final:true }
+  ];
+
+  // ---- Mentor flow (Vera) — two paths: approve or improve ----
+  const mentorScript = [
+    { agent: "Hi, I'm Vera. I vet practitioners joining Strata. I'll ask 6 questions, then evaluate your application. Honest answers help me route you well — and protect the quality of the platform.", replies: [{label:"Begin application →", next:true}] },
+    { agent: "Where do you currently work, and what's your role?", step:1, replies: [
+        {label:"Senior Strategist at IDEO", value:"Senior Design Strategist at IDEO, San Francisco. I've been there 4 years; before that I led service design at a healthcare innovation lab."},
+        {label:"Try a borderline profile", value:"I'm a Senior UX Designer at a fintech company. I do some strategy work informally."}
+      ]},
+    { agent: "How many years have you worked specifically in design strategy?", step:2, replies: [
+        {label:"8 years", value:"8 years total. 6 at consultancies, 2 in-house."},
+        {label:"~2 years (borderline)", value:"About 2 years. Mostly within my UX role, leading some upstream framing."}
+      ]},
+    { agent: "Describe how you use design strategy in your current role. Concrete examples are most useful.", step:3, replies: [
+        {label:"Specific answer", value:"I lead 6-9 month engagements where we reframe a client's product question into a market or organizational one. Recent example: helped a national insurance carrier go from \"redesign the app\" to \"redesign the renewal moment\" — which shifted their roadmap by 18 months and unlocked a $40M retention strategy."},
+        {label:"Generic answer", value:"I do design strategy work on most projects. I help with stakeholder alignment, research, and ideation. I use a lot of frameworks like double diamond and JTBD."}
+      ]},
+    { agent: "How much time can you give to Strata each week — answering routed questions, occasional intros?", step:4, replies: [
+        {label:"2 hours / week", value:"About 2 hours per week. Mostly async."},
+        {label:"30 min / week", value:"Maybe 30 minutes — I'm pretty stretched."}
+      ]},
+    { agent: "Pick the areas you'd genuinely be the right person to ask about. Quality over quantity — 3-5 is ideal.", step:5, replies: [
+        {label:"Use focused selection", value:"Service design, consulting workflows, portfolio storytelling, career transitions from non-strategy backgrounds.", focused:true},
+        {label:"Use broad selection (9 picks)", value:"Service design, UX, research, product, ideation, prototyping, workshops, strategy, careers.", focused:false}
+      ]},
+    { agent: "Last input — your LinkedIn URL so I can verify your history and public work.", step:6, replies: [
+        {label:"linkedin.com/in/maya-kapoor", value:"linkedin.com/in/maya-kapoor", verify:'mentor'}
+      ]},
+    { agent: "I'm running my evaluation now — cross-checking your LinkedIn, answer depth, and public work…", step:7, evaluate:true }
+  ];
+
+  // ---- State ----
+  let studentState = {idx:0, verified:false};
+  let mentorState = {idx:0, verified:false, focused:true, specific:true, yrs:8, hrs:2};
+
+  function setFlow(which){
+    document.querySelectorAll('.join-toggle-opt').forEach(o => o.classList.toggle('active', o.dataset.flow === which));
+    document.getElementById('flow-student').style.display = which === 'student' ? '' : 'none';
+    document.getElementById('flow-mentor').style.display = which === 'mentor' ? '' : 'none';
+  }
+
+  function restartFlow(which){
+    if (which === 'student'){
+      studentState = {idx:0, verified:false};
+      document.getElementById('studentChat').innerHTML = '';
+      document.getElementById('studentLinkedinCard').style.display = 'none';
+      document.getElementById('studentTiersCard').style.display = 'none';
+      document.getElementById('studentOutcome').style.display = 'none';
+      document.querySelectorAll('#studentChecklist .checklist-item').forEach(ci => ci.classList.remove('done', 'active'));
+      document.querySelector('#studentChecklist .checklist-item[data-step="1"]').classList.add('active');
+      document.getElementById('studentProgress').textContent = 'Step 1 of 5';
+      runStudent();
+    } else {
+      mentorState = {idx:0, verified:false, focused:true, specific:true, yrs:8, hrs:2};
+      document.getElementById('mentorChat').innerHTML = '';
+      document.getElementById('mentorLinkedinCard').style.display = 'none';
+      document.getElementById('mentorApproved').style.display = 'none';
+      document.getElementById('mentorImprove').style.display = 'none';
+      document.querySelectorAll('#mentorChecklist .checklist-item').forEach(ci => ci.classList.remove('done', 'active'));
+      document.querySelector('#mentorChecklist .checklist-item[data-step="1"]').classList.add('active');
+      document.getElementById('mentorProgress').textContent = 'Step 1 of 7';
+      runMentor();
+    }
+  }
+
+  function appendMsg(containerId, who, text){
+    const c = document.getElementById(containerId);
+    const m = document.createElement('div');
+    m.className = `msg ${who}`;
+    m.innerHTML = `
+      <div class="msg-av ${who}">${who === 'ai' ? (containerId === 'studentChat' ? 'A' : 'V') : 'S'}</div>
+      <div class="msg-bubble">${text}</div>
+    `;
+    c.appendChild(m);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  function appendTyping(containerId){
+    const c = document.getElementById(containerId);
+    const m = document.createElement('div');
+    m.className = 'msg ai typing-wrap';
+    m.innerHTML = `<div class="msg-av ai">${containerId === 'studentChat' ? 'A' : 'V'}</div><div class="typing"><span></span><span></span><span></span></div>`;
+    c.appendChild(m);
+    c.scrollTop = c.scrollHeight;
+    return m;
+  }
+
+  function setChecklist(prefix, step){
+    const items = document.querySelectorAll(`#${prefix}Checklist .checklist-item`);
+    items.forEach(ci => {
+      const s = parseInt(ci.dataset.step);
+      ci.classList.remove('done', 'active');
+      if (s < step) ci.classList.add('done');
+      else if (s === step) ci.classList.add('active');
+    });
+  }
+
+  function runStudent(){
+    const node = studentScript[studentState.idx];
+    if (!node) return;
+    const repliesEl = document.getElementById('studentReplies');
+    repliesEl.innerHTML = '';
+
+    // show typing then agent message
+    const t = appendTyping('studentChat');
+    setTimeout(() => {
+      t.remove();
+      appendMsg('studentChat', 'ai', node.agent);
+      if (node.step) {
+        setChecklist('student', node.step);
+        document.getElementById('studentProgress').textContent = `Step ${node.step} of 5`;
+      }
+      if (node.showTiers) {
+        document.getElementById('studentTiersCard').style.display = '';
+      }
+      if (node.final){
+        document.getElementById('studentOutcome').style.display = '';
+        document.querySelectorAll('#studentChecklist .checklist-item').forEach(ci => ci.classList.add('done'));
+        document.querySelectorAll('#studentChecklist .checklist-item').forEach(ci => ci.classList.remove('active'));
+        document.getElementById('studentProgress').textContent = 'Complete ✓';
+        return;
+      }
+      // render reply chips
+      (node.replies || []).forEach((r, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'reply-chip' + (r.next ? ' next' : '');
+        chip.innerHTML = r.label;
+        chip.onclick = () => handleStudentReply(r);
+        repliesEl.appendChild(chip);
+      });
+    }, 700);
+  }
+
+  function handleStudentReply(r){
+    document.getElementById('studentReplies').innerHTML = '';
+    if (r.value) appendMsg('studentChat', 'user', r.value);
+
+    if (r.verify === 'student'){
+      // show linkedin card and run verification
+      const card = document.getElementById('studentLinkedinCard');
+      card.style.display = '';
+      const rows = document.querySelectorAll('#studentVerifyProgress .verify-row');
+      rows.forEach(row => { row.classList.remove('checking','passed'); row.classList.add('pending'); row.querySelector('.vr-icon').textContent = '○'; });
+      let i = 0;
+      const step = () => {
+        if (i > 0){
+          rows[i-1].classList.remove('checking');
+          rows[i-1].classList.add('passed');
+          rows[i-1].querySelector('.vr-icon').textContent = '✓';
+        }
+        if (i < rows.length){
+          rows[i].classList.remove('pending');
+          rows[i].classList.add('checking');
+          rows[i].querySelector('.vr-icon').textContent = '';
+          i++;
+          setTimeout(step, 700);
+        } else {
+          // verification done — advance
+          studentState.verified = true;
+          studentState.idx++;
+          setTimeout(runStudent, 600);
+        }
+      };
+      step();
+      return;
+    }
+
+    if (r.finalize === 'student'){
+      // jump to final state
+      studentState.idx = studentScript.length - 1;
+      setTimeout(runStudent, 500);
+      return;
+    }
+
+    studentState.idx++;
+    setTimeout(runStudent, 500);
+  }
+
+  // ---- Mentor flow ----
+  function runMentor(){
+    const node = mentorScript[mentorState.idx];
+    if (!node) return;
+    const repliesEl = document.getElementById('mentorReplies');
+    repliesEl.innerHTML = '';
+    const t = appendTyping('mentorChat');
+    setTimeout(() => {
+      t.remove();
+      appendMsg('mentorChat', 'ai', node.agent);
+      if (node.step) {
+        setChecklist('mentor', node.step);
+        document.getElementById('mentorProgress').textContent = `Step ${node.step} of 7`;
+      }
+      if (node.evaluate){
+        runMentorEvaluation();
+        return;
+      }
+      (node.replies || []).forEach(r => {
+        const chip = document.createElement('div');
+        chip.className = 'reply-chip' + (r.next ? ' next' : '');
+        chip.innerHTML = r.label;
+        chip.onclick = () => handleMentorReply(r);
+        repliesEl.appendChild(chip);
+      });
+    }, 700);
+  }
+
+  function handleMentorReply(r){
+    document.getElementById('mentorReplies').innerHTML = '';
+    if (r.value) appendMsg('mentorChat', 'user', r.value);
+
+    // Track signals
+    if (r.value && r.value.includes('UX Designer at a fintech')) { mentorState.yrs = 2; mentorState.role = 'ux'; }
+    if (r.value && r.value.includes('2 years total')) mentorState.yrs = 2;
+    if (r.value && r.value.includes('30 minutes')) mentorState.hrs = 0.5;
+    if (r.value && r.value.includes('Generic answer')) mentorState.specific = false;
+    if (r.value && r.value.startsWith("I do design strategy work on most projects")) mentorState.specific = false;
+    if (r.focused === false) mentorState.focused = false;
+
+    if (r.verify === 'mentor'){
+      // adjust LinkedIn card based on signals
+      if (mentorState.yrs <= 2 || mentorState.role === 'ux'){
+        document.getElementById('mentorLiName').textContent = 'Maya Kapoor';
+        document.getElementById('mentorLiHeadline').textContent = 'Senior UX Designer at a fintech · 6 yrs · UX/UI, research';
+      }
+      const card = document.getElementById('mentorLinkedinCard');
+      card.style.display = '';
+      const rows = document.querySelectorAll('#mentorVerifyProgress .verify-row');
+      rows.forEach(row => { row.classList.remove('checking','passed','failed'); row.classList.add('pending'); row.querySelector('.vr-icon').textContent = '○'; });
+      let i = 0;
+      const failIndex = (mentorState.yrs <= 2) ? 1 : (!mentorState.specific ? 3 : -1);
+      const step = () => {
+        if (i > 0){
+          rows[i-1].classList.remove('checking');
+          if (i-1 === failIndex) {
+            rows[i-1].classList.add('failed');
+            rows[i-1].querySelector('.vr-icon').textContent = '!';
+          } else {
+            rows[i-1].classList.add('passed');
+            rows[i-1].querySelector('.vr-icon').textContent = '✓';
+          }
+        }
+        if (i < rows.length){
+          rows[i].classList.remove('pending');
+          rows[i].classList.add('checking');
+          rows[i].querySelector('.vr-icon').textContent = '';
+          i++;
+          setTimeout(step, 700);
+        } else {
+          mentorState.verified = true;
+          mentorState.idx++;
+          setTimeout(runMentor, 600);
+        }
+      };
+      step();
+      return;
+    }
+
+    mentorState.idx++;
+    setTimeout(runMentor, 500);
+  }
+
+  function runMentorEvaluation(){
+    // Decide approve vs improve
+    const isStrong = mentorState.yrs >= 5 && mentorState.specific && mentorState.focused;
+    setTimeout(() => {
+      const t = appendTyping('mentorChat');
+      setTimeout(() => {
+        t.remove();
+        if (isStrong){
+          appendMsg('mentorChat', 'ai', "Evaluation complete. Your answers are specific, your LinkedIn confirms 8 years of design strategy work, and your selected skills match real evidence in your history. <strong>Approved.</strong>");
+          document.getElementById('mentorApproved').style.display = '';
+          document.querySelectorAll('#mentorChecklist .checklist-item').forEach(ci => ci.classList.add('done'));
+          document.querySelectorAll('#mentorChecklist .checklist-item').forEach(ci => ci.classList.remove('active'));
+          document.getElementById('mentorProgress').textContent = 'Approved ✓';
+        } else {
+          appendMsg('mentorChat', 'ai', "Evaluation complete. I'm not able to approve your application right now — but it's a fixable gap, not a no. I've sent specific suggestions to the panel on the right. You can reapply in 4 weeks.");
+          document.getElementById('mentorImprove').style.display = '';
+          document.getElementById('mentorProgress').textContent = 'Not approved · reapply in 4 wks';
+        }
+      }, 1200);
+    }, 400);
+  }
+
+  // Kick off both flows on page load
+  // runStudent();  // legacy
+  // runMentor();   // legacy
+  } // end if(false)
+  } // end __legacyOnboardingDormant
+</script>
+
+</body>
+</html>
